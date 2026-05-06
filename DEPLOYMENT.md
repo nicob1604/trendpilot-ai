@@ -10,6 +10,13 @@ Das Projekt wurde erfolgreich über Vercel deployed.
 
 TrendPilot AI ist öffentlich deployed und funktionsfähig.
 
+Öffentliche Vercel-URL:
+
+https://trendpilot-ai-two.vercel.app
+
+Deployment ist live und funktionsfähig.
+Startseite, Dashboard und API wurden online geprüft.
+
 ## Öffentliche Seiten
 
 - Startseite funktioniert online.
@@ -18,9 +25,9 @@ TrendPilot AI ist öffentlich deployed und funktionsfähig.
 
 ## Online-Routen
 
-- `/`
-- `/dashboard`
-- `/api/trends`
+- https://trendpilot-ai-two.vercel.app/
+- https://trendpilot-ai-two.vercel.app/dashboard
+- https://trendpilot-ai-two.vercel.app/api/trends
 
 ## API-Status
 
@@ -64,6 +71,7 @@ Routen:
 
 Aktuell wird der kostenlose GitHub-Free- und Vercel-Hobby/Free-Workflow genutzt.
 Keine kostenpflichtigen Zusatzfunktionen wurden aktiviert.
+Weiterhin GitHub Free + Vercel Hobby/Free.
 
 Nicht aktivieren:
 

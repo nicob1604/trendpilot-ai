@@ -3,6 +3,8 @@
 ## Aktueller Status
 
 TrendPilot AI ist öffentlich deployed und funktionsfähig.
+Deployment ist live und funktionsfähig.
+Startseite, Dashboard und API wurden online geprüft.
 
 ## GitHub Repository
 
@@ -11,6 +13,10 @@ https://github.com/nicob1604/trendpilot-ai
 ## Vercel Deployment
 
 Das Projekt wurde erfolgreich über Vercel deployed.
+
+## Öffentliche Vercel-URL
+
+https://trendpilot-ai-two.vercel.app
 
 ## Aktueller Stand
 
@@ -31,9 +37,9 @@ Das Projekt wurde erfolgreich über Vercel deployed.
 
 ## Online-Routen
 
-- `/`
-- `/dashboard`
-- `/api/trends`
+- https://trendpilot-ai-two.vercel.app/
+- https://trendpilot-ai-two.vercel.app/dashboard
+- https://trendpilot-ai-two.vercel.app/api/trends
 
 ## API-Status
 
@@ -80,6 +86,7 @@ Später vorbereitet für n8n, Google Sheets, Supabase oder externe API.
 
 ## Kostenstatus
 
+Weiterhin GitHub Free + Vercel Hobby/Free.
 Aktuell wird der kostenlose GitHub-Free- und Vercel-Hobby/Free-Workflow genutzt.
 Keine kostenpflichtigen Zusatzfunktionen wurden aktiviert.
 
@@ -94,6 +101,5 @@ Nicht aktivieren:
 ## Nächste mögliche Schritte
 
 - Vercel-Projekt weiter beobachten
-- öffentliche URL dokumentieren, falls separat gewünscht
 - Domain vorbereiten, aber keine kostenpflichtige Domain aktivieren
 - echte Datenquelle anbinden
