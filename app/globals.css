@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "Courier New", Courier, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.noise-layer {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.42) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+}
+
+.grid-layer {
+  background-image:
+    linear-gradient(rgba(174, 183, 194, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(174, 183, 194, 0.08) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 78%);
+}
+
+.trend-line {
+  pointer-events: none;
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(164, 196, 0, 0.06),
+    rgba(164, 196, 0, 0.42),
+    rgba(174, 183, 194, 0.16),
+    transparent
+  );
+  opacity: 0.68;
+  transform-origin: center;
+}
+
+.trend-line::after {
+  content: "";
+  position: absolute;
+  right: 24%;
+  top: -3px;
+  height: 7px;
+  width: 7px;
+  border-radius: 999px;
+  background: #a4c400;
+  box-shadow: 0 0 22px rgba(164, 196, 0, 0.28);
+}
+
+.trend-line-one {
+  top: 32%;
+  transform: rotate(-8deg);
+  animation: trend-drift 8s ease-in-out infinite;
+}
+
+.trend-line-two {
+  top: 56%;
+  transform: rotate(6deg);
+  animation: trend-drift 10s ease-in-out infinite reverse;
+}
+
+@keyframes trend-drift {
+  0%,
+  100% {
+    translate: 0 0;
+    opacity: 0.42;
+  }
+
+  50% {
+    translate: 3% -8px;
+    opacity: 0.76;
+  }
+}
