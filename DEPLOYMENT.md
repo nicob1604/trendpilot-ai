@@ -1,5 +1,36 @@
 # TrendPilot AI
 
+## GitHub Repository
+
+https://github.com/nicob1604/trendpilot-ai
+
+## Vercel Deployment
+
+Das Projekt wurde erfolgreich über Vercel deployed.
+
+TrendPilot AI ist öffentlich deployed und funktionsfähig.
+
+## Öffentliche Seiten
+
+- Startseite funktioniert online.
+- Dashboard funktioniert online.
+- API funktioniert online.
+
+## Online-Routen
+
+- `/`
+- `/dashboard`
+- `/api/trends`
+
+## API-Status
+
+Die Online-API `/api/trends` liefert erfolgreich:
+
+- `source`
+- `updatedAt`
+- `count`
+- `trends`
+
 ## Lokale Entwicklung
 
 ```powershell
@@ -19,7 +50,7 @@ http://localhost:3000
 npm.cmd run build
 ```
 
-## Aktueller Build-Status
+## Build-Status
 
 Build erfolgreich getestet.
 
@@ -29,16 +60,24 @@ Routen:
 - `/dashboard`
 - `/api/trends`
 
-## Hinweis
+## Kostenstatus
 
-PowerShell / `npm.cmd run dev` ist nur für lokale Entwicklung.
-Später läuft die Seite online über Vercel, Netlify oder eine eigene Domain.
+Aktuell wird der kostenlose GitHub-Free- und Vercel-Hobby/Free-Workflow genutzt.
+Keine kostenpflichtigen Zusatzfunktionen wurden aktiviert.
 
-## Geplanter späterer Ablauf
+Nicht aktivieren:
 
-Code → GitHub → Vercel oder Netlify → öffentliche URL
+- Vercel Pro
+- Vercel Agent
+- kostenpflichtige Domain
+- kostenpflichtige Datenbank
+- kostenpflichtige Add-ons
 
-## Aktueller Datenstatus
+## Datenstatus
 
 Das Dashboard lädt aktuell Mock-Daten über die interne API `/api/trends`.
 Später können n8n, Google Sheets, Supabase oder eine externe API angebunden werden.
+
+## Deployment-Ablauf
+
+Code → GitHub → Vercel → öffentliche URL
