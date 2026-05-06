@@ -1,0 +1,126 @@
+{
+  "name": "TrendPilot AI - Google Sheets Blueprint",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      id: 'agentic-workflows',\n      name: 'Agentic Workflows',\n      category: 'Workflows',\n      status: 'Hohe Relevanz',\n      score: 94,\n      businessImpact: 'Enterprise-Teams verlagern repetitive Aufgaben zunehmend in KI-gestützte Prozessketten.',\n      summary: 'Agentic Workflows zeigen starkes Momentum, weil Unternehmen wiederkehrende Aufgaben zunehmend durch KI-gestützte Prozessketten automatisieren.',\n      recommendation: 'Für Produktivitäts-, Operations- und Marketingteams beobachten und erste interne Use Cases systematisch sammeln.',\n      source: 'Launches & Tool-Updates',\n      timeframe: 'Diese Woche',\n      signalType: 'Workflow'\n    }\n  },\n  {\n    json: {\n      id: 'ki-compliance-ops',\n      name: 'KI-Compliance Ops',\n      category: 'Compliance',\n      status: 'Hohe Relevanz',\n      score: 88,\n      businessImpact: 'Unternehmen benötigen klarere Prozesse für Governance, Dokumentation und Monitoring ihrer KI-Nutzung.',\n      summary: 'KI-Compliance wird wichtiger, weil Unternehmen Governance, Dokumentation und Monitoring für KI-Nutzung strukturierter abbilden müssen.',\n      recommendation: 'Für regulierte Branchen priorisieren und mögliche Tool-Kategorien für Monitoring und Freigabeprozesse prüfen.',\n      source: 'Regulatorische Signale',\n      timeframe: 'Diese Woche',\n      signalType: 'Compliance'\n    }\n  }\n];"
+      },
+      "id": "create-example-trends",
+      "name": "Beispiel-Trends erzeugen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const requiredFields = [\n  'id',\n  'name',\n  'category',\n  'status',\n  'score',\n  'businessImpact',\n  'summary',\n  'recommendation',\n  'source',\n  'timeframe',\n  'signalType'\n];\n\nreturn items.map((item) => {\n  const normalized = {};\n\n  for (const field of requiredFields) {\n    normalized[field] = item.json[field] ?? '';\n  }\n\n  normalized.score = Number(normalized.score) || 0;\n\n  return { json: normalized };\n});"
+      },
+      "id": "normalize-trend-data",
+      "name": "Trend-Daten normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "trends",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "name": "={{ $json.name }}",
+            "category": "={{ $json.category }}",
+            "status": "={{ $json.status }}",
+            "score": "={{ $json.score }}",
+            "businessImpact": "={{ $json.businessImpact }}",
+            "summary": "={{ $json.summary }}",
+            "recommendation": "={{ $json.recommendation }}",
+            "source": "={{ $json.source }}",
+            "timeframe": "={{ $json.timeframe }}",
+            "signalType": "={{ $json.signalType }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "append-to-google-sheets",
+      "name": "In Google Sheets schreiben",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1020,
+        300
+      ],
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Beispiel-Trends erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Beispiel-Trends erzeugen": {
+      "main": [
+        [
+          {
+            "node": "Trend-Daten normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trend-Daten normalisieren": {
+      "main": [
+        [
+          {
+            "node": "In Google Sheets schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "template",
+  "triggerCount": 0,
+  "tags": []
+}
