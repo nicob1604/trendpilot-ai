@@ -4,6 +4,20 @@ Diese Struktur ist noch keine echte Anbindung, sondern nur die Vorbereitung für
 
 Jede Tabellenzeile entspricht einem Trend. Die Spaltennamen sollten exakt wie unten beschrieben verwendet werden, damit n8n, Google Sheets, Supabase oder eine API die Daten später sauber in das Dashboard-Format übertragen können.
 
+## Geplantes Google Sheet
+
+Dieses Sheet ist die geplante kostenlose Start-Datenquelle für echte Trend-Daten:
+
+https://docs.google.com/spreadsheets/d/1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo/edit?gid=29451432#gid=29451432
+
+- Spreadsheet-ID: `1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo`
+- Tabellenblatt: `trends`
+- gid: `29451432`
+- Status: Das Google Sheet wurde erstellt und enthält bereits die Header-Zeile mit allen benötigten Trend-Feldern.
+- Erster Test-Trend: `Agentic Workflows`
+
+Die App nutzt aktuell noch Mock-Daten über `/api/trends`. Es wurde noch keine echte Google-Sheets-Anbindung umgesetzt. Später soll `/api/trends` die Daten aus diesem Sheet oder über n8n beziehen.
+
 ## Empfohlene Spalten
 
 | Spalte | Beschreibung | Beispielwert | Pflichtfeld |

@@ -80,6 +80,20 @@ Die Online-API `/api/trends` liefert erfolgreich:
 Aktuell Mock-Daten.
 Später vorbereitet für n8n, Google Sheets, Supabase oder externe API.
 
+## Geplante Google-Sheet-Datenquelle
+
+Dieses Google Sheet ist die geplante kostenlose Start-Datenquelle für echte Trend-Daten:
+
+https://docs.google.com/spreadsheets/d/1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo/edit?gid=29451432#gid=29451432
+
+- Spreadsheet-ID: `1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo`
+- Tabellenblatt: `trends`
+- gid: `29451432`
+- Status: Das Google Sheet wurde erstellt und enthält bereits die Header-Zeile mit allen benötigten Trend-Feldern.
+- Erster Test-Trend: `Agentic Workflows`
+
+Die App nutzt aktuell noch Mock-Daten über `/api/trends`. Es wurde noch keine echte Google-Sheets-Anbindung umgesetzt. Später soll `/api/trends` die Daten aus diesem Sheet oder über n8n beziehen.
+
 ## Build-Status
 
 `npm.cmd run build` wurde erfolgreich ausgeführt.
@@ -89,6 +103,7 @@ Später vorbereitet für n8n, Google Sheets, Supabase oder externe API.
 Weiterhin GitHub Free + Vercel Hobby/Free.
 Aktuell wird der kostenlose GitHub-Free- und Vercel-Hobby/Free-Workflow genutzt.
 Keine kostenpflichtigen Zusatzfunktionen wurden aktiviert.
+Keine kostenpflichtigen Dienste aktivieren.
 
 Nicht aktivieren:
 
