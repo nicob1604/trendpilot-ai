@@ -31,6 +31,37 @@ https://docs.google.com/spreadsheets/d/1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6
 
 Die App nutzt aktuell noch Mock-Daten über `/api/trends`. Es wurde noch keine echte Google-Sheets-Anbindung umgesetzt. Später soll `/api/trends` die Daten aus diesem Sheet oder über n8n beziehen.
 
+## 3.2 n8n-Teststatus
+
+Der Workflow `TrendPilot AI – Google Sheets Blueprint` wurde in n8n importiert, mit dem Google Sheet verbunden und manuell getestet.
+
+Aktuelle Node-Kette:
+
+Manual Trigger -> Beispiel-Trends erzeugen -> Trend-Daten normalisieren -> Bestehende Trends lesen -> Nur neue Trends filtern -> In Google Sheets schreiben
+
+Google Sheet:
+
+https://docs.google.com/spreadsheets/d/1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo/edit?gid=29451432#gid=29451432
+
+Teststatus:
+
+- Der Workflow wurde manuell getestet.
+- Google Sheets Append funktioniert.
+- Duplikat-Schutz funktioniert über die `id`.
+- Wenn eine `id` bereits im Sheet vorhanden ist, wird sie nicht erneut geschrieben.
+
+Aktueller Inhalt im Sheet:
+
+- Agentic Workflows
+- KI-Compliance Ops
+
+Wichtig:
+
+- Der Workflow nutzt aktuell einen Manual Trigger.
+- Er läuft nicht automatisch.
+- Publish ist aktuell nicht zwingend nötig, weil noch kein Schedule-, Webhook- oder App-Trigger verwendet wird.
+- Die App nutzt weiterhin Mock-Daten über `/api/trends`.
+
 ## 4. Geplanter Datenfluss
 
 Quellen -> n8n Workflow -> Bewertung/Normalisierung -> Google Sheets -> API `/api/trends` -> Dashboard
@@ -94,6 +125,7 @@ Der aktuelle kostenlose Workflow soll erhalten bleiben:
 
 - GitHub Free bleibt aktiv
 - Vercel Hobby/Free bleibt aktiv
+- n8n-Test läuft nur manuell
 - keine kostenpflichtige Domain
 - keine kostenpflichtige Datenbank
 - keine kostenpflichtigen APIs
@@ -111,4 +143,4 @@ Der aktuelle kostenlose Workflow soll erhalten bleiben:
 
 ## 12. Noch nicht umsetzen
 
-Diese Datei ist nur die Planung. Es wird noch keine echte n8n- oder Google-Sheets-Anbindung umgesetzt.
+Diese Datei ist nur die Planung. Der n8n-Workflow wurde manuell getestet, aber es wird noch keine automatische n8n- oder Google-Sheets-Anbindung in der App genutzt.
