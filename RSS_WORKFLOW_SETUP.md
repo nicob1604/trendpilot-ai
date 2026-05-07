@@ -1,0 +1,110 @@
+# TrendPilot AI RSS Workflow Setup
+
+## 1. Ziel des RSS-Testzweigs
+
+Der RSS-Testzweig soll vorbereiten, wie TrendPilot AI später echte KI-Trends, Tool-Updates und Marktsignale aus RSS-Feeds lesen, in das bestehende Trend-Datenformat umwandeln und ins Google Sheet schreiben kann.
+
+Aktuell ist dieser Workflow nur ein Blueprint. Es ist noch kein produktiver RSS-Import aktiv.
+
+## 2. Geplanter Ablauf
+
+Manual Trigger -> RSS Feed per HTTP lesen -> RSS-Daten in Trend-Kandidaten umwandeln -> Trend-Daten normalisieren -> Bestehende Trends lesen -> Nur neue Trends filtern -> Neue Trends in Google Sheets schreiben
+
+## 3. Enthaltene Nodes
+
+1. Manual Trigger
+   - Startet den RSS-Testzweig manuell.
+
+2. RSS Feed per HTTP lesen
+   - Liest einen RSS-Feed über einen HTTP Request Node.
+   - Aktueller Platzhalter:
+     `https://example.com/feed.xml`
+
+3. RSS-Daten in Trend-Kandidaten umwandeln
+   - Extrahiert RSS-Titel, Link, Beschreibung und Veröffentlichungsdatum.
+   - Erstellt daraus erste Trend-Kandidaten.
+
+4. Trend-Daten normalisieren
+   - Stellt sicher, dass alle benötigten Trend-Felder vorhanden sind.
+   - Bereinigt `id`, `name`, `category`, `status` und `score`.
+
+5. Bestehende Trends lesen
+   - Liest vorhandene Zeilen aus dem Google Sheet.
+
+6. Nur neue Trends filtern
+   - Vergleicht neue Trend-Kandidaten mit bestehenden Sheet-Zeilen.
+   - Verwendet dafür die `id`.
+
+7. Neue Trends in Google Sheets schreiben
+   - Schreibt nur neue Trends in das Tabellenblatt `trends`.
+
+## 4. RSS-Feed-URLs eintragen
+
+Die spätere echte RSS-URL wird im Node `RSS Feed per HTTP lesen` eingetragen.
+
+Aktueller Platzhalter:
+
+`https://example.com/feed.xml`
+
+Später kann dieser Wert durch eine echte RSS-Feed-URL ersetzt werden, zum Beispiel von AI-News-Seiten, Produktblogs oder Tool-Webseiten.
+
+## 5. Umwandlung von RSS-Items in Trend-Felder
+
+Der Code Node `RSS-Daten in Trend-Kandidaten umwandeln` bildet RSS-Daten auf diese Trend-Felder ab:
+
+- `id`: wird aus dem RSS-Titel, Link oder Veröffentlichungsdatum erzeugt
+- `name`: RSS-Titel
+- `category`: Standardwert `AI News`
+- `status`: Standardwert `Neu`
+- `score`: Standardwert `70`
+- `businessImpact`: Kurzfassung aus der RSS-Beschreibung
+- `summary`: Zusammenfassung aus der RSS-Beschreibung
+- `recommendation`: Standardempfehlung zur fachlichen Prüfung
+- `source`: RSS-Link oder `RSS Feed`
+- `timeframe`: Standardwert `Heute`
+- `signalType`: Standardwert `RSS`
+
+Diese Werte sind Startwerte. Sie sollen später durch eine bessere Bewertungslogik ergänzt oder manuell überprüft werden.
+
+## 6. Duplikate über `id` verhindern
+
+Der Workflow liest vor dem Schreiben bestehende Trends aus dem Google Sheet.
+
+Der Node `Nur neue Trends filtern` erstellt eine Liste vorhandener IDs. Nur Trend-Kandidaten mit einer neuen `id` werden an den Google-Sheets-Append-Node weitergegeben.
+
+Wenn eine `id` bereits im Sheet vorhanden ist, wird sie nicht erneut geschrieben.
+
+## 7. Hinweise
+
+- Der Workflow ist noch nicht automatisch aktiv.
+- Es werden keine kostenpflichtigen Dienste genutzt.
+- Es ist noch kein produktiver RSS-Import aktiv.
+- Es sind keine echten Credentials in der Blueprint-Datei enthalten.
+- Die bestehende App nutzt weiterhin Mock-Daten über `/api/trends`.
+- Es gibt keine Änderung an `/api/trends`.
+- Es gibt keine Änderung am Dashboard.
+- Es gibt keine Änderung an der Landingpage.
+
+## 8. Google-Sheet-Ziel
+
+- Spreadsheet-ID: `1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo`
+- Tabellenblatt: `trends`
+- gid: `29451432`
+
+Google-Sheet-Link:
+
+https://docs.google.com/spreadsheets/d/1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo/edit?gid=29451432#gid=29451432
+
+## 9. Benötigte Trend-Felder
+
+- `id`
+- `name`
+- `category`
+- `status`
+- `score`
+- `businessImpact`
+- `summary`
+- `recommendation`
+- `source`
+- `timeframe`
+- `signalType`

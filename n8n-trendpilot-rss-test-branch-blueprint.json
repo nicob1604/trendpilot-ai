@@ -1,0 +1,225 @@
+{
+  "name": "TrendPilot AI - RSS Test Branch Blueprint",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://example.com/feed.xml",
+        "responseFormat": "string",
+        "options": {}
+      },
+      "id": "read-rss-feed",
+      "name": "RSS Feed per HTTP lesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function stripTags(value) {\n  return String(value || '').replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();\n}\n\nfunction extractTag(block, tag) {\n  const match = block.match(new RegExp(`<${tag}[^>]*>([\\\\s\\\\S]*?)<\\\\/${tag}>`, 'i'));\n  return match ? stripTags(match[1]) : '';\n}\n\nfunction slugify(value) {\n  return String(value || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[^a-z0-9]+/g, '-')\n    .replace(/^-+|-+$/g, '')\n    .slice(0, 80);\n}\n\nconst trends = [];\n\nfor (const item of items) {\n  const xml = String(item.json.body || item.json.data || item.json || '');\n  const blocks = xml.match(/<item[\\s\\S]*?<\\/item>/gi) || xml.match(/<entry[\\s\\S]*?<\\/entry>/gi) || [];\n\n  for (const block of blocks.slice(0, 10)) {\n    const title = extractTag(block, 'title');\n    const link = extractTag(block, 'link');\n    const description = extractTag(block, 'description') || extractTag(block, 'summary') || extractTag(block, 'content');\n    const published = extractTag(block, 'pubDate') || extractTag(block, 'published') || extractTag(block, 'updated');\n    const idBase = title || link || published;\n\n    if (!idBase) continue;\n\n    trends.push({\n      json: {\n        id: `rss-${slugify(idBase)}`,\n        name: title || 'RSS Trend Signal',\n        category: 'AI News',\n        status: 'Neu',\n        score: 70,\n        businessImpact: description ? description.slice(0, 220) : 'Neues RSS-Signal mit möglicher Relevanz für KI-, Produkt- oder Marktbeobachtung.',\n        summary: description ? description.slice(0, 260) : 'Dieses Signal wurde aus einem RSS-Feed extrahiert und sollte fachlich geprüft werden.',\n        recommendation: 'Signal prüfen, Relevanz bewerten und bei Bedarf Score, Kategorie und Handlungsempfehlung manuell schärfen.',\n        source: link || 'RSS Feed',\n        timeframe: 'Heute',\n        signalType: 'RSS'\n      }\n    });\n  }\n}\n\nreturn trends;"
+      },
+      "id": "rss-to-trend-candidates",
+      "name": "RSS-Daten in Trend-Kandidaten umwandeln",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const requiredFields = [\n  'id',\n  'name',\n  'category',\n  'status',\n  'score',\n  'businessImpact',\n  'summary',\n  'recommendation',\n  'source',\n  'timeframe',\n  'signalType'\n];\n\nreturn items.map((item) => {\n  const normalized = {};\n\n  for (const field of requiredFields) {\n    normalized[field] = item.json[field] ?? '';\n  }\n\n  normalized.id = String(normalized.id || '').trim();\n  normalized.name = String(normalized.name || '').trim();\n  normalized.category = String(normalized.category || 'AI News').trim();\n  normalized.status = String(normalized.status || 'Neu').trim();\n  normalized.score = Math.max(0, Math.min(100, Number(normalized.score) || 0));\n\n  return { json: normalized };\n}).filter((item) => item.json.id && item.json.name);"
+      },
+      "id": "normalize-trend-data",
+      "name": "Trend-Daten normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "trends",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "read-existing-trends",
+      "name": "Bestehende Trends lesen",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1040,
+        140
+      ],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const candidates = $input.all(0);\nconst existingRows = $input.all(1);\n\nconst existingIds = new Set(\n  existingRows\n    .map((item) => String(item.json.id || '').trim())\n    .filter(Boolean)\n);\n\nreturn candidates.filter((item) => {\n  const id = String(item.json.id || '').trim();\n  return id && !existingIds.has(id);\n});"
+      },
+      "id": "filter-new-trends",
+      "name": "Nur neue Trends filtern",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "trends",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "name": "={{ $json.name }}",
+            "category": "={{ $json.category }}",
+            "status": "={{ $json.status }}",
+            "score": "={{ $json.score }}",
+            "businessImpact": "={{ $json.businessImpact }}",
+            "summary": "={{ $json.summary }}",
+            "recommendation": "={{ $json.recommendation }}",
+            "source": "={{ $json.source }}",
+            "timeframe": "={{ $json.timeframe }}",
+            "signalType": "={{ $json.signalType }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "append-new-trends",
+      "name": "Neue Trends in Google Sheets schreiben",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1560,
+        0
+      ],
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Feed per HTTP lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed per HTTP lesen": {
+      "main": [
+        [
+          {
+            "node": "RSS-Daten in Trend-Kandidaten umwandeln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS-Daten in Trend-Kandidaten umwandeln": {
+      "main": [
+        [
+          {
+            "node": "Trend-Daten normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trend-Daten normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Bestehende Trends lesen",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Nur neue Trends filtern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bestehende Trends lesen": {
+      "main": [
+        [
+          {
+            "node": "Nur neue Trends filtern",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Nur neue Trends filtern": {
+      "main": [
+        [
+          {
+            "node": "Neue Trends in Google Sheets schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "rss-test-branch-template",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "name": "blueprint"
+    },
+    {
+      "name": "rss-test"
+    }
+  ]
+}
