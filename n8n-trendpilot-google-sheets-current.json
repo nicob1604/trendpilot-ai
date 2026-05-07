@@ -1,0 +1,306 @@
+{
+  "name": "TrendPilot AI - Google Sheets Blueprint",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "def5392f-e6be-4226-97dc-3079fd8bf6f8",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      id: 'agentic-workflows',\n      name: 'Agentic Workflows',\n      category: 'Workflows',\n      status: 'Hohe Relevanz',\n      score: 94,\n      businessImpact: 'Enterprise-Teams verlagern repetitive Aufgaben zunehmend in KI-gestützte Prozessketten.',\n      summary: 'Agentic Workflows zeigen starkes Momentum, weil Unternehmen wiederkehrende Aufgaben zunehmend durch KI-gestützte Prozessketten automatisieren.',\n      recommendation: 'Für Produktivitäts-, Operations- und Marketingteams beobachten und erste interne Use Cases systematisch sammeln.',\n      source: 'Launches & Tool-Updates',\n      timeframe: 'Diese Woche',\n      signalType: 'Workflow'\n    }\n  },\n  {\n    json: {\n      id: 'ki-compliance-ops',\n      name: 'KI-Compliance Ops',\n      category: 'Compliance',\n      status: 'Hohe Relevanz',\n      score: 88,\n      businessImpact: 'Unternehmen benötigen klarere Prozesse für Governance, Dokumentation und Monitoring ihrer KI-Nutzung.',\n      summary: 'KI-Compliance wird wichtiger, weil Unternehmen Governance, Dokumentation und Monitoring für KI-Nutzung strukturierter abbilden müssen.',\n      recommendation: 'Für regulierte Branchen priorisieren und mögliche Tool-Kategorien für Monitoring und Freigabeprozesse prüfen.',\n      source: 'Regulatorische Signale',\n      timeframe: 'Diese Woche',\n      signalType: 'Compliance'\n    }\n  }\n];"
+      },
+      "id": "cf00c26e-d2c0-47f6-a8ba-07766832ef9b",
+      "name": "Beispiel-Trends erzeugen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const requiredFields = [\n  'id',\n  'name',\n  'category',\n  'status',\n  'score',\n  'businessImpact',\n  'summary',\n  'recommendation',\n  'source',\n  'timeframe',\n  'signalType'\n];\n\nreturn items.map((item) => {\n  const normalized = {};\n\n  for (const field of requiredFields) {\n    normalized[field] = item.json[field] ?? '';\n  }\n\n  normalized.score = Number(normalized.score) || 0;\n\n  return { json: normalized };\n});"
+      },
+      "id": "1eb6812d-c6d8-42e3-8df3-b04a06c96b32",
+      "name": "Trend-Daten normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "trends",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "name": "={{ $json.name }}",
+            "category": "={{ $json.category }}",
+            "status": "={{ $json.status }}",
+            "score": "={{ $json.score }}",
+            "businessImpact": "={{ $json.businessImpact }}",
+            "summary": "={{ $json.summary }}",
+            "recommendation": "={{ $json.recommendation }}",
+            "source": "={{ $json.source }}",
+            "timeframe": "={{ $json.timeframe }}",
+            "signalType": "={{ $json.signalType }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "businessImpact",
+              "displayName": "businessImpact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommendation",
+              "displayName": "recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timeframe",
+              "displayName": "timeframe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "signalType",
+              "displayName": "signalType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9b16069f-f9b0-4b34-afa7-2c18483001ff",
+      "name": "In Google Sheets schreiben",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1200,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "wjJfIKFyQz38jDDA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "trends",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        0
+      ],
+      "id": "1d9bdd9b-a0a2-4b3e-b3ca-c25281a6d5b1",
+      "name": "Bestehende Trends lesen",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "wjJfIKFyQz38jDDA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const newTrends = $('Trend-Daten normalisieren').all();\nconst existingRows = $input.all();\n\nconst existingIds = new Set(\n  existingRows\n    .map((item) => String(item.json.id || '').trim())\n    .filter(Boolean)\n);\n\nconst filteredTrends = newTrends.filter((item) => {\n  const id = String(item.json.id || '').trim();\n  return id && !existingIds.has(id);\n});\n\nreturn filteredTrends;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        0
+      ],
+      "id": "c628e8cd-b3aa-48eb-a495-b5de532f74c6",
+      "name": "Nur neue Trends filtern",
+      "alwaysOutputData": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Beispiel-Trends erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Beispiel-Trends erzeugen": {
+      "main": [
+        [
+          {
+            "node": "Trend-Daten normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trend-Daten normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Bestehende Trends lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bestehende Trends lesen": {
+      "main": [
+        [
+          {
+            "node": "Nur neue Trends filtern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nur neue Trends filtern": {
+      "main": [
+        [
+          {
+            "node": "In Google Sheets schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4ea1f3b5-c7c0-4a45-8fa0-6f4e27919a86",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "418e3b99acfe2aad5174d079763a7e217ac6723a96fb2cfbcde2563f7db8ec9b"
+  },
+  "id": "LB6zfjOf3S921iwt",
+  "tags": []
+}
