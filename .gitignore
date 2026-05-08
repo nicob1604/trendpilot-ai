@@ -43,3 +43,8 @@ next-env.d.ts
 # Local Next.js dev logs
 .next-dev-*.log
 .next-dev-*.err
+
+# Google service account keys - never commit
+*service-account*.json
+trendpilot-ai-n8n-*.json
+*-*.iam.gserviceaccount.com*.json
