@@ -4,12 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Trend } from "./data";
 
-const stats = [
-  { label: "Neue Signale", value: "12", detail: "seit heute Morgen" },
-  { label: "Hohe Priorität", value: "4", detail: "direkt prüfen" },
-  { label: "Beobachten", value: "18", detail: "weiter im Radar" },
-];
-
 const filters = ["Alle", "Hohe Relevanz", "Neu", "Beobachten"];
 
 const sortOptions = [
@@ -58,6 +52,33 @@ export default function DashboardPage() {
   const [activeFilter, setActiveFilter] = useState("Alle");
   const [sortOrder, setSortOrder] = useState("score-desc");
   const [selectedTrend, setSelectedTrend] = useState<Trend | null>(null);
+
+  const stats = useMemo(() => {
+    const highPriorityCount = trends.filter(
+      (trend) => trend.status.trim() === "Hohe Relevanz" || trend.score >= 80,
+    ).length;
+    const watchCount = trends.filter(
+      (trend) => trend.status.trim() === "Beobachten" || trend.score < 80,
+    ).length;
+
+    return [
+      {
+        label: "Neue Signale",
+        value: String(trends.length),
+        detail: "geladen",
+      },
+      {
+        label: "Hohe Priorität",
+        value: String(highPriorityCount),
+        detail: "direkt prüfen",
+      },
+      {
+        label: "Beobachten",
+        value: String(watchCount),
+        detail: "weiter im Radar",
+      },
+    ];
+  }, [trends]);
 
   const loadTrends = useCallback(async () => {
     try {
