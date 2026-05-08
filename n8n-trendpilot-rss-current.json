@@ -1,0 +1,364 @@
+{
+  "name": "TrendPilot AI - RSS Test Branch Blueprint",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "65244a3a-b42a-4899-9d9b-8c0f4514ea53",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.theverge.com/rss/index.xml",
+        "options": {}
+      },
+      "id": "23d38445-e0bb-495f-a9db-6df9bc397100",
+      "name": "RSS Feed per HTTP lesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        16,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst keywordPatterns = [\n  /\\bai\\b/i,\n  /\\bartificial intelligence\\b/i,\n  /\\bopenai\\b/i,\n  /\\bchatgpt\\b/i,\n  /\\banthropic\\b/i,\n  /\\bclaude\\b/i,\n  /\\bgemini\\b/i,\n  /\\bcopilot\\b/i,\n  /\\bllm\\b/i,\n  /\\bllms\\b/i,\n  /\\bai agent\\b/i,\n  /\\bagentic\\b/i,\n  /\\bautomation\\b/i,\n  /\\bmachine learning\\b/i,\n  /\\bnvidia\\b/i,\n  /\\brobot\\b/i,\n  /\\bneural\\b/i\n];\n\nfunction stripHtml(value) {\n  return String(value || '').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim();\n}\n\nfunction slugify(value) {\n  return String(value || '')\n    .toLowerCase()\n    .replace(/https?:\\/\\//g, '')\n    .replace(/[^a-z0-9]+/g, '-')\n    .replace(/^-+|-+$/g, '')\n    .slice(0, 80);\n}\n\nfunction getText(item) {\n  return [\n    item.json.title,\n    item.json.contentSnippet,\n    item.json.summary,\n    item.json.content,\n    item.json.link\n  ]\n    .filter(Boolean)\n    .map(stripHtml)\n    .join(' ');\n}\n\nfunction isRelevant(item) {\n  const text = getText(item);\n  return keywordPatterns.some((pattern) => pattern.test(text));\n}\n\nfunction getScore(text) {\n  const lower = text.toLowerCase();\n\n  if (\n    lower.includes('openai') ||\n    lower.includes('chatgpt') ||\n    lower.includes('anthropic') ||\n    lower.includes('claude') ||\n    lower.includes('gemini') ||\n    lower.includes('nvidia')\n  ) {\n    return 84;\n  }\n\n  if (\n    lower.includes('artificial intelligence') ||\n    lower.includes('ai agent') ||\n    lower.includes('agentic') ||\n    lower.includes('machine learning')\n  ) {\n    return 78;\n  }\n\n  return 68;\n}\n\nconst relevantItems = items.filter(isRelevant);\n\nreturn relevantItems.map((item) => {\n  const title = stripHtml(item.json.title || 'Unbenannter RSS-Trend');\n  const link = item.json.link || '';\n  const pubDate = item.json.pubDate || item.json.isoDate || '';\n  const text = getText(item);\n  const cleanSummary = stripHtml(\n    item.json.contentSnippet ||\n    item.json.summary ||\n    item.json.content ||\n    title\n  );\n\n  const score = getScore(text);\n\n  return {\n    json: {\n      id: slugify(link || title),\n      name: title,\n      category: 'AI News',\n      status: score >= 80 ? 'Hohe Relevanz' : 'Beobachten',\n      score,\n      businessImpact: `Dieses RSS-Signal kann für Marktbeobachtung, Produktstrategie oder Innovation relevant sein: ${title}`,\n      summary: cleanSummary.slice(0, 350),\n      recommendation: 'Signal prüfen, Relevanz bewerten und bei Bedarf für das Trend-Radar priorisieren.',\n      source: 'The Verge RSS',\n      timeframe: pubDate ? 'RSS Import' : 'Unbekannt',\n      signalType: 'RSS'\n    }\n  };\n});"
+      },
+      "id": "049f466f-c3d3-4d86-b67a-91a9a5394fb0",
+      "name": "RSS-Daten in Trend-Kandidaten umwandeln",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const requiredFields = [\n  'id',\n  'name',\n  'category',\n  'status',\n  'score',\n  'businessImpact',\n  'summary',\n  'recommendation',\n  'source',\n  'timeframe',\n  'signalType'\n];\n\nreturn items.map((item) => {\n  const normalized = {};\n\n  for (const field of requiredFields) {\n    normalized[field] = item.json[field] ?? '';\n  }\n\n  normalized.id = String(normalized.id || '').trim();\n  normalized.name = String(normalized.name || '').trim();\n  normalized.category = String(normalized.category || 'AI News').trim();\n  normalized.status = String(normalized.status || 'Neu').trim();\n  normalized.score = Math.max(0, Math.min(100, Number(normalized.score) || 0));\n\n  return { json: normalized };\n}).filter((item) => item.json.id && item.json.name);"
+      },
+      "id": "70d490f9-942b-4034-a613-224ae4ccd520",
+      "name": "Trend-Daten normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "trends",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "3bf0c793-71fd-4443-9d4b-36d6b5a2d351",
+      "name": "Bestehende Trends lesen",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1040,
+        144
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "8OCTDflTN4pK95W9",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidates = $('Trend-Daten normalisieren').all();\nconst existingRows = $('Bestehende Trends lesen').all();\n\nconst existingIds = new Set(\n  existingRows\n    .map((item) => String(item.json.id || '').trim())\n    .filter(Boolean)\n);\n\nconst newTrends = candidates.filter((item) => {\n  const id = String(item.json.id || '').trim();\n  return id && !existingIds.has(id);\n});\n\nreturn newTrends;"
+      },
+      "id": "f690fe78-fd9d-4a28-8279-d29e71e9dae4",
+      "name": "Nur neue Trends filtern",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "trends",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "businessImpact",
+              "displayName": "businessImpact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "recommendation",
+              "displayName": "recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timeframe",
+              "displayName": "timeframe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "signalType",
+              "displayName": "signalType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "5c54b708-c6c0-494e-ab33-8b1053b11484",
+      "name": "Neue Trends in Google Sheets schreiben",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1568,
+        0
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "8OCTDflTN4pK95W9",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.theverge.com/rss/index.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2ff0a3b7-b0fc-4655-872b-e81a73909502",
+      "name": "RSS Read"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed per HTTP lesen": {
+      "main": [
+        []
+      ]
+    },
+    "RSS-Daten in Trend-Kandidaten umwandeln": {
+      "main": [
+        [
+          {
+            "node": "Trend-Daten normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trend-Daten normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Bestehende Trends lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nur neue Trends filtern": {
+      "main": [
+        [
+          {
+            "node": "Neue Trends in Google Sheets schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "RSS-Daten in Trend-Kandidaten umwandeln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bestehende Trends lesen": {
+      "main": [
+        [
+          {
+            "node": "Nur neue Trends filtern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "aa051342-78e1-4db9-b8bd-691b441fa949",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "418e3b99acfe2aad5174d079763a7e217ac6723a96fb2cfbcde2563f7db8ec9b"
+  },
+  "id": "iAHA8jaYkgqX3K0D",
+  "tags": [
+    {
+      "updatedAt": "2026-05-07T10:13:52.024Z",
+      "createdAt": "2026-05-07T10:13:52.024Z",
+      "id": "MxYT9VHOrvzzmSVh",
+      "name": "blueprint"
+    },
+    {
+      "updatedAt": "2026-05-07T10:13:52.035Z",
+      "createdAt": "2026-05-07T10:13:52.035Z",
+      "id": "n3msZ5vmGb6ti2ku",
+      "name": "rss-test"
+    }
+  ]
+}
