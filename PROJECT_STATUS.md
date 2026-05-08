@@ -125,6 +125,34 @@ Wichtig:
 - Publish ist aktuell nicht zwingend nötig, weil noch kein Schedule-, Webhook- oder App-Trigger verwendet wird.
 - Die App nutzt weiterhin Mock-Daten über `/api/trends`.
 
+## n8n-RSS-Testworkflow-Status
+
+Der RSS-Testworkflow `TrendPilot AI – RSS Test Branch` funktioniert manuell.
+
+Testdetails:
+
+- RSS Read funktioniert mit `https://www.theverge.com/rss/index.xml`.
+- RSS-Daten werden in Trend-Kandidaten umgewandelt.
+- Die Trend-Daten werden normalisiert.
+- Google Sheets wird über den Google Service Account gelesen und beschrieben.
+- Neue RSS-Trends wurden erfolgreich ins Google Sheet geschrieben.
+- Ein zweiter Lauf hat keine Duplikate geschrieben.
+- Der Duplikat-Schutz funktioniert über das Feld `id`.
+
+Sicherheits- und Betriebsstatus:
+
+- Der aktuelle Workflow läuft weiterhin nur manuell.
+- Es ist kein Schedule Trigger aktiv.
+- Es sind keine kostenpflichtigen Dienste aktiviert.
+- Der sichere Workflow-Export heißt `n8n-trendpilot-rss-current.json`.
+- Die Datei wurde auf `private_key` geprüft und enthält keinen Google-Service-Account-Private-Key.
+- Keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien committen.
+- Das Dashboard nutzt weiterhin Mock-Daten über `/api/trends`.
+
+Nächster großer Schritt:
+
+`/api/trends` auf echte Google-Sheet-Daten umstellen, mit Mock-Daten als Fallback.
+
 ## Build-Status
 
 `npm.cmd run build` wurde erfolgreich ausgeführt.
@@ -136,6 +164,8 @@ Aktuell wird der kostenlose GitHub-Free- und Vercel-Hobby/Free-Workflow genutzt.
 Keine kostenpflichtigen Zusatzfunktionen wurden aktiviert.
 Keine kostenpflichtigen Dienste aktivieren.
 n8n-Test läuft nur manuell.
+RSS-Testworkflow läuft nur manuell.
+Es ist kein Schedule Trigger aktiv.
 
 Nicht aktivieren:
 

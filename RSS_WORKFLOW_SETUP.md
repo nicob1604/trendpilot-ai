@@ -4,11 +4,11 @@
 
 Der RSS-Testzweig soll vorbereiten, wie TrendPilot AI später echte KI-Trends, Tool-Updates und Marktsignale aus RSS-Feeds lesen, in das bestehende Trend-Datenformat umwandeln und ins Google Sheet schreiben kann.
 
-Aktuell ist dieser Workflow nur ein Blueprint. Es ist noch kein produktiver RSS-Import aktiv.
+Der RSS-Testworkflow `TrendPilot AI – RSS Test Branch` funktioniert inzwischen manuell. Es ist weiterhin kein produktiver automatischer RSS-Import aktiv.
 
 ## 2. Geplanter Ablauf
 
-Manual Trigger -> RSS Feed per HTTP lesen -> RSS-Daten in Trend-Kandidaten umwandeln -> Trend-Daten normalisieren -> Bestehende Trends lesen -> Nur neue Trends filtern -> Neue Trends in Google Sheets schreiben
+Manual Trigger -> RSS Feed lesen -> RSS-Daten in Trend-Kandidaten umwandeln -> Trend-Daten normalisieren -> Bestehende Trends lesen -> Nur neue Trends filtern -> Neue Trends in Google Sheets schreiben
 
 ## 3. Enthaltene Nodes
 
@@ -16,9 +16,9 @@ Manual Trigger -> RSS Feed per HTTP lesen -> RSS-Daten in Trend-Kandidaten umwan
    - Startet den RSS-Testzweig manuell.
 
 2. RSS Feed per HTTP lesen
-   - Liest einen RSS-Feed über einen HTTP Request Node.
-   - Aktueller Platzhalter:
-     `https://example.com/feed.xml`
+   - Liest einen RSS-Feed.
+   - Erfolgreich getestet mit:
+     `https://www.theverge.com/rss/index.xml`
 
 3. RSS-Daten in Trend-Kandidaten umwandeln
    - Extrahiert RSS-Titel, Link, Beschreibung und Veröffentlichungsdatum.
@@ -40,13 +40,13 @@ Manual Trigger -> RSS Feed per HTTP lesen -> RSS-Daten in Trend-Kandidaten umwan
 
 ## 4. RSS-Feed-URLs eintragen
 
-Die spätere echte RSS-URL wird im Node `RSS Feed per HTTP lesen` eingetragen.
+Die RSS-URL wird im Node `RSS Feed per HTTP lesen` eingetragen.
 
-Aktueller Platzhalter:
+Erfolgreich getestete RSS-URL:
 
-`https://example.com/feed.xml`
+`https://www.theverge.com/rss/index.xml`
 
-Später kann dieser Wert durch eine echte RSS-Feed-URL ersetzt werden, zum Beispiel von AI-News-Seiten, Produktblogs oder Tool-Webseiten.
+Später kann dieser Wert durch weitere echte RSS-Feed-URLs ersetzt oder ergänzt werden, zum Beispiel von AI-News-Seiten, Produktblogs oder Tool-Webseiten.
 
 ## 5. Umwandlung von RSS-Items in Trend-Felder
 
@@ -74,16 +74,38 @@ Der Node `Nur neue Trends filtern` erstellt eine Liste vorhandener IDs. Nur Tren
 
 Wenn eine `id` bereits im Sheet vorhanden ist, wird sie nicht erneut geschrieben.
 
+Der manuelle Test hat bestätigt:
+
+- Neue RSS-Trends wurden erfolgreich ins Google Sheet geschrieben.
+- Ein zweiter Lauf hat keine Duplikate geschrieben.
+- Der Duplikat-Schutz funktioniert über das Feld `id`.
+
+## 6.1 Aktueller RSS-Teststatus
+
+- Der Workflow `TrendPilot AI – RSS Test Branch` funktioniert manuell.
+- RSS Read funktioniert mit `https://www.theverge.com/rss/index.xml`.
+- RSS-Daten werden in Trend-Kandidaten umgewandelt.
+- Die Trend-Daten werden normalisiert.
+- Google Sheets wird über den Google Service Account gelesen und beschrieben.
+- Der aktuelle Workflow läuft weiterhin nur manuell.
+- Es ist kein Schedule Trigger aktiv.
+- Der sichere Workflow-Export heißt `n8n-trendpilot-rss-current.json`.
+- Die Datei wurde auf `private_key` geprüft und enthält keinen Google-Service-Account-Private-Key.
+- Das Dashboard nutzt weiterhin Mock-Daten über `/api/trends`.
+
 ## 7. Hinweise
 
 - Der Workflow ist noch nicht automatisch aktiv.
+- Es ist kein Schedule Trigger aktiv.
 - Es werden keine kostenpflichtigen Dienste genutzt.
-- Es ist noch kein produktiver RSS-Import aktiv.
-- Es sind keine echten Credentials in der Blueprint-Datei enthalten.
+- Es ist noch kein produktiver automatischer RSS-Import aktiv.
+- Keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien committen.
 - Die bestehende App nutzt weiterhin Mock-Daten über `/api/trends`.
 - Es gibt keine Änderung an `/api/trends`.
 - Es gibt keine Änderung am Dashboard.
 - Es gibt keine Änderung an der Landingpage.
+
+Der nächste große Schritt nach dieser Dokumentation ist die Umstellung von `/api/trends` auf echte Google-Sheet-Daten mit Mock-Daten als Fallback.
 
 ## 8. Google-Sheet-Ziel
 

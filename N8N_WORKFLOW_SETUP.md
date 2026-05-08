@@ -98,6 +98,32 @@ Später können vor dem Normalisierungs-Node echte Quellen ergänzt werden, zum 
 - externe APIs
 - manuelle Review-Schritte
 
+## RSS-Testworkflow
+
+Der RSS-Testworkflow `TrendPilot AI – RSS Test Branch` funktioniert manuell.
+
+Testdetails:
+
+- RSS Read funktioniert mit `https://www.theverge.com/rss/index.xml`.
+- RSS-Daten werden in Trend-Kandidaten umgewandelt.
+- Die Trend-Daten werden normalisiert.
+- Google Sheets wird über den Google Service Account gelesen und beschrieben.
+- Neue RSS-Trends wurden erfolgreich ins Google Sheet geschrieben.
+- Ein zweiter Lauf hat keine Duplikate geschrieben.
+- Der Duplikat-Schutz funktioniert über das Feld `id`.
+
+Aktueller Betriebsstatus:
+
+- Der Workflow läuft weiterhin nur manuell.
+- Es ist kein Schedule Trigger aktiv.
+- Es sind keine kostenpflichtigen Dienste aktiviert.
+- Der sichere Workflow-Export heißt `n8n-trendpilot-rss-current.json`.
+- Die Datei wurde auf `private_key` geprüft und enthält keinen Google-Service-Account-Private-Key.
+- Das Dashboard nutzt weiterhin Mock-Daten über `/api/trends`.
+- Keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien committen.
+
+Der nächste große Schritt nach dieser Dokumentation ist die Umstellung von `/api/trends` auf echte Google-Sheet-Daten mit Mock-Daten als Fallback.
+
 ## Aktueller Status
 
 Der Workflow `TrendPilot AI – Google Sheets Blueprint` wurde in n8n importiert, mit dem Google Sheet verbunden und manuell getestet.

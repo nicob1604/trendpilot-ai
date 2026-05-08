@@ -12,7 +12,18 @@ TrendPilot AI soll später echte KI-Trends, Tool-Updates, Produktlaunches, GitHu
 - n8n-Workflow ist importiert
 - Google-Sheets-Append funktioniert
 - Duplikat-Schutz über `id` funktioniert
-- Aktuell werden im n8n-Workflow noch Testdaten erzeugt
+- Der RSS-Testworkflow `TrendPilot AI – RSS Test Branch` funktioniert manuell
+- RSS Read funktioniert mit `https://www.theverge.com/rss/index.xml`
+- RSS-Daten werden in Trend-Kandidaten umgewandelt und normalisiert
+- Google Sheets wird über den Google Service Account gelesen und beschrieben
+- Neue RSS-Trends wurden erfolgreich ins Google Sheet geschrieben
+- Ein zweiter Lauf hat keine Duplikate geschrieben
+- Der Duplikat-Schutz funktioniert über das Feld `id`
+- Der aktuelle Workflow läuft weiterhin nur manuell
+- Es ist kein Schedule Trigger aktiv
+- Der sichere Workflow-Export heißt `n8n-trendpilot-rss-current.json`
+- Die Datei wurde auf `private_key` geprüft und enthält keinen Google-Service-Account-Private-Key
+- Das Dashboard nutzt weiterhin Mock-Daten über `/api/trends`
 
 ## 3. Empfohlene erste kostenlose Quellen
 
@@ -59,6 +70,10 @@ Geplanter Ablauf:
 
 Quelle lesen -> Rohdaten extrahieren -> Trend-Kandidaten erzeugen -> Daten normalisieren -> Score berechnen -> Duplikate prüfen -> neue Trends ins Google Sheet schreiben
 
+Aktueller RSS-Testablauf:
+
+RSS Read -> RSS-Daten in Trend-Kandidaten umwandeln -> Trend-Daten normalisieren -> Google Sheets lesen -> Nur neue Trends über `id` filtern -> neue RSS-Trends ins Google Sheet schreiben
+
 ## 7. Trend-Bewertung
 
 Erste Bewertungslogik:
@@ -79,12 +94,14 @@ Erste Bewertungslogik:
 - keine kostenpflichtige Domain aktivieren
 - keine bezahlten Scraping-Dienste nutzen
 - keine Vercel-Agent-Funktionen aktivieren
+- keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien committen
+- keine automatische Ausführung ohne bewusste Freigabe aktivieren
 
 ## 9. Nächster technischer Schritt nach dieser Datei
 
-Der nächste konkrete Schritt soll sein:
+Der nächste große Schritt nach dieser Dokumentation ist:
 
-n8n-Workflow um einen ersten RSS-Testzweig erweitern.
+`/api/trends` auf echte Google-Sheet-Daten umstellen, mit Mock-Daten als Fallback.
 
 ## 10. Noch nicht umsetzen
 
@@ -93,3 +110,5 @@ n8n-Workflow um einen ersten RSS-Testzweig erweitern.
 - Keine Änderung am Dashboard
 - Keine externe Datenquelle aktivieren
 - Keine kostenpflichtigen Dienste aktivieren
+- Kein Schedule Trigger aktivieren
+- Keine Secrets oder Private Keys committen
