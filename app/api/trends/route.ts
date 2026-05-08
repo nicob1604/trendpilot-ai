@@ -41,8 +41,91 @@ const trendFields = [
   "signalType",
 ] as const;
 
+const namedHtmlEntities: Record<string, string> = {
+  amp: "&",
+  apos: "'",
+  gt: ">",
+  ldquo: "\"",
+  lsquo: "'",
+  lt: "<",
+  nbsp: " ",
+  quot: "\"",
+  rdquo: "\"",
+  rsquo: "'",
+};
+
+function decodeHtmlEntities(value: string) {
+  return value.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (match, entity: string) => {
+    const normalizedEntity = entity.toLowerCase();
+
+    if (normalizedEntity.startsWith("#x")) {
+      const codePoint = Number.parseInt(normalizedEntity.slice(2), 16);
+      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+    }
+
+    if (normalizedEntity.startsWith("#")) {
+      const codePoint = Number.parseInt(normalizedEntity.slice(1), 10);
+      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+    }
+
+    return namedHtmlEntities[normalizedEntity] || match;
+  });
+}
+
+function cleanText(value: string | undefined) {
+  return decodeHtmlEntities(String(value || ""))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function improveGenericRssCopy(trend: Trend): Trend {
+  const isRssSignal = trend.signalType.toLowerCase() === "rss";
+  const hasGenericBusinessImpact =
+    trend.businessImpact.toLowerCase().includes("neues rss-signal") ||
+    trend.businessImpact.toLowerCase().includes("möglicher relevanz");
+  const hasGenericRecommendation =
+    trend.recommendation.toLowerCase().includes("signal prüfen") ||
+    trend.recommendation.toLowerCase().includes("manuell schärfen");
+
+  if (!isRssSignal && !hasGenericBusinessImpact && !hasGenericRecommendation) {
+    return trend;
+  }
+
+  return {
+    ...trend,
+    businessImpact: hasGenericBusinessImpact
+      ? `${trend.name} sollte auf Auswirkungen für KI-Roadmaps, Produktpositionierung und Marktkommunikation geprüft werden.`
+      : trend.businessImpact,
+    recommendation: hasGenericRecommendation
+      ? "Für Marketing-, Produkt- und Innovationsteams einordnen: Relevanz prüfen, Quelle bewerten und bei belastbarem Signal priorisieren."
+      : trend.recommendation,
+  };
+}
+
+function sanitizeTrend(trend: Trend): Trend {
+  const sanitizedTrend: Trend = {
+    id: trend.id.trim(),
+    name: cleanText(trend.name),
+    category: cleanText(trend.category),
+    status: cleanText(trend.status),
+    score: trend.score,
+    businessImpact: cleanText(trend.businessImpact),
+    summary: cleanText(trend.summary),
+    recommendation: cleanText(trend.recommendation),
+    source: cleanText(trend.source),
+    timeframe: cleanText(trend.timeframe),
+    signalType: cleanText(trend.signalType),
+  };
+
+  return improveGenericRssCopy(sanitizedTrend);
+}
+
+function sanitizeTrends(trends: Trend[]) {
+  return trends.map(sanitizeTrend);
+}
+
 function createFallbackResponse(source: "mock" | "fallback" = "fallback"): TrendsResponse {
-  const trends = getTrends();
+  const trends = sanitizeTrends(getTrends());
 
   return {
     source,
@@ -176,7 +259,7 @@ function normalizeTrendRow(row: string[], headerIndex: Map<string, number>): Tre
     return null;
   }
 
-  return trend;
+  return sanitizeTrend(trend);
 }
 
 function normalizeSheetValues(values: string[][] | undefined) {
@@ -216,7 +299,7 @@ async function getGoogleSheetTrends() {
   }
 
   const data = (await response.json()) as SheetsValuesResponse;
-  return normalizeSheetValues(data.values);
+  return sanitizeTrends(normalizeSheetValues(data.values));
 }
 
 export async function GET() {
