@@ -1,0 +1,413 @@
+{
+  "name": "TrendPilot AI – YouTube RSS Test Branch",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "bc503505-259a-4958-905b-026351f55e2b",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCXZCJLdBC09xxGZ6gcdrc6A",
+        "options": {}
+      },
+      "id": "0a645c91-4ab1-440d-8337-e89b59d97222",
+      "name": "RSS Feed per HTTP lesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        208,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst strongAiPatterns = [\n  /\\bopenai\\b/i,\n  /\\bchatgpt\\b/i,\n  /\\banthropic\\b/i,\n  /\\bclaude\\b/i,\n  /\\bgemini\\b/i,\n  /\\bcopilot\\b/i,\n  /\\bllm\\b/i,\n  /\\bllms\\b/i,\n  /\\bgenerative ai\\b/i,\n  /\\bartificial intelligence\\b/i,\n  /\\bmachine learning\\b/i,\n  /\\bai agent\\b/i,\n  /\\bai agents\\b/i,\n  /\\bagentic\\b/i,\n  /\\bagentic workflows\\b/i,\n  /\\bnvidia\\b/i,\n  /\\bai chip\\b/i,\n  /\\bai chips\\b/i,\n  /\\bfoundation model\\b/i\n];\n\nconst weakAiPatterns = [\n  /\\bai\\b/i,\n  /\\bautomation\\b/i,\n  /\\brobot\\b/i,\n  /\\bneural\\b/i\n];\n\nconst businessPatterns = [\n  /\\benterprise\\b/i,\n  /\\bbusiness\\b/i,\n  /\\bworkflow\\b/i,\n  /\\bworkflows\\b/i,\n  /\\bproductivity\\b/i,\n  /\\bcompliance\\b/i,\n  /\\bgovernance\\b/i,\n  /\\bregulation\\b/i,\n  /\\bsecurity\\b/i,\n  /\\bsafety\\b/i,\n  /\\bdeveloper\\b/i,\n  /\\bdevelopers\\b/i,\n  /\\bstartup\\b/i,\n  /\\bfunding\\b/i,\n  /\\binvestment\\b/i,\n  /\\bchips\\b/i,\n  /\\bchip\\b/i,\n  /\\bcloud\\b/i,\n  /\\bapi\\b/i,\n  /\\bautomation\\b/i,\n  /\\btool\\b/i,\n  /\\btools\\b/i,\n  /\\bplatform\\b/i,\n  /\\blaunch\\b/i,\n  /\\benterprise ai\\b/i,\n  /\\binfrastructure\\b/i\n];\n\nconst excludePatterns = [\n  /\\bairpods\\b/i,\n  /\\blawn mower\\b/i,\n  /\\bmovie\\b/i,\n  /\\btrailer\\b/i,\n  /\\bgaming\\b/i,\n  /\\bgame\\b/i,\n  /\\bconsole\\b/i,\n  /\\bplaystation\\b/i,\n  /\\bps5\\b/i,\n  /\\bnintendo\\b/i,\n  /\\bswitch\\b/i,\n  /\\btv show\\b/i,\n  /\\bcelebrity\\b/i,\n  /\\bsports\\b/i,\n  /\\bcamera bag\\b/i,\n  /\\bbackpack\\b/i,\n  /\\bsale\\b/i,\n  /\\bdiscount\\b/i\n];\n\nconst htmlEntities = {\n  '&amp;': '&',\n  '&quot;': '\"',\n  '&apos;': \"'\",\n  '&#39;': \"'\",\n  '&nbsp;': ' ',\n  '&rsquo;': '’',\n  '&lsquo;': '‘',\n  '&rdquo;': '”',\n  '&ldquo;': '“',\n  '&ndash;': '–',\n  '&mdash;': '—',\n  '&euro;': '€',\n  '&yen;': '¥'\n};\n\nfunction decodeHtmlEntities(value) {\n  return String(value || '')\n    .replace(/&#(\\d+);/g, (_, code) => String.fromCharCode(Number(code)))\n    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCharCode(parseInt(code, 16)))\n    .replace(/&[a-zA-Z0-9#]+;/g, (entity) => htmlEntities[entity] || entity);\n}\n\nfunction cleanText(value) {\n  return decodeHtmlEntities(value)\n    .replace(/<script[\\s\\S]*?<\\/script>/gi, ' ')\n    .replace(/<style[\\s\\S]*?<\\/style>/gi, ' ')\n    .replace(/<[^>]*>/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction slugify(value) {\n  return cleanText(value)\n    .toLowerCase()\n    .replace(/https?:\\/\\//g, '')\n    .replace(/[^a-z0-9]+/g, '-')\n    .replace(/^-+|-+$/g, '')\n    .slice(0, 80);\n}\n\nfunction getText(item) {\n  return [\n    item.json.title,\n    item.json.contentSnippet,\n    item.json.summary,\n    item.json.content,\n    item.json.link\n  ]\n    .filter(Boolean)\n    .map(cleanText)\n    .join(' ');\n}\n\nfunction hasMatch(patterns, text) {\n  return patterns.some((pattern) => pattern.test(text));\n}\n\nfunction isRelevant(item) {\n  const text = getText(item);\n  const title = cleanText(item.json.title || '');\n\n  const hasStrongAi = hasMatch(strongAiPatterns, text);\n  const hasWeakAi = hasMatch(weakAiPatterns, text);\n  const hasBusinessContext = hasMatch(businessPatterns, text);\n  const hasExcludedTopic = hasMatch(excludePatterns, text);\n\n  if (hasExcludedTopic && !hasStrongAi) {\n    return false;\n  }\n\n  if (hasStrongAi) {\n    return true;\n  }\n\n  if (hasWeakAi && hasBusinessContext) {\n    return true;\n  }\n\n  return false;\n}\n\nfunction getCategory(text) {\n  const lower = text.toLowerCase();\n\n  if (\n    lower.includes('compliance') ||\n    lower.includes('regulation') ||\n    lower.includes('governance') ||\n    lower.includes('safety') ||\n    lower.includes('security') ||\n    lower.includes('board') ||\n    lower.includes('lawsuit') ||\n    lower.includes('trial')\n  ) {\n    return 'AI Governance';\n  }\n\n  if (\n    lower.includes('agent') ||\n    lower.includes('agentic') ||\n    lower.includes('workflow') ||\n    lower.includes('automation')\n  ) {\n    return 'AI Workflows';\n  }\n\n  if (\n    lower.includes('chip') ||\n    lower.includes('chips') ||\n    lower.includes('nvidia') ||\n    lower.includes('infrastructure') ||\n    lower.includes('cloud') ||\n    lower.includes('data center') ||\n    lower.includes('datacenter')\n  ) {\n    return 'AI Infrastructure';\n  }\n\n  if (\n    lower.includes('developer') ||\n    lower.includes('api') ||\n    lower.includes('tool') ||\n    lower.includes('tools') ||\n    lower.includes('platform')\n  ) {\n    return 'AI Tools';\n  }\n\n  return 'AI News';\n}\n\nfunction getScore(text) {\n  const lower = text.toLowerCase();\n  let score = 60;\n\n  if (lower.includes('openai') || lower.includes('chatgpt')) score += 18;\n  if (lower.includes('anthropic') || lower.includes('claude')) score += 16;\n  if (lower.includes('gemini') || lower.includes('copilot')) score += 14;\n\n  if (\n    lower.includes('agent') ||\n    lower.includes('agentic') ||\n    lower.includes('workflow') ||\n    lower.includes('automation')\n  ) {\n    score += 12;\n  }\n\n  if (\n    lower.includes('enterprise') ||\n    lower.includes('business') ||\n    lower.includes('productivity') ||\n    lower.includes('company') ||\n    lower.includes('companies')\n  ) {\n    score += 10;\n  }\n\n  if (\n    lower.includes('compliance') ||\n    lower.includes('regulation') ||\n    lower.includes('governance') ||\n    lower.includes('security') ||\n    lower.includes('safety') ||\n    lower.includes('board') ||\n    lower.includes('lawsuit') ||\n    lower.includes('trial')\n  ) {\n    score += 10;\n  }\n\n  if (\n    lower.includes('nvidia') ||\n    lower.includes('chip') ||\n    lower.includes('chips') ||\n    lower.includes('infrastructure') ||\n    lower.includes('cloud') ||\n    lower.includes('data center') ||\n    lower.includes('datacenter')\n  ) {\n    score += 10;\n  }\n\n  if (\n    lower.includes('funding') ||\n    lower.includes('investment') ||\n    lower.includes('invest') ||\n    lower.includes('launch') ||\n    lower.includes('production')\n  ) {\n    score += 6;\n  }\n\n  if (hasMatch(excludePatterns, text)) {\n    score -= 18;\n  }\n\n  return Math.max(45, Math.min(score, 96));\n}\n\nfunction getRecommendation(score, category) {\n  if (score >= 80) {\n    return `Für das Trend-Radar priorisieren und kurzfristig prüfen, ob daraus ein konkreter Use Case im Bereich ${category} entsteht.`;\n  }\n\n  if (score >= 70) {\n    return `Beobachten und mit weiteren Quellen abgleichen, ob sich das Signal im Bereich ${category} verstärkt.`;\n  }\n\n  return `Nur als schwaches Signal beobachten und erst priorisieren, wenn weitere relevante Quellen das Thema bestätigen.`;\n}\n\nfunction getBusinessImpact(category, title) {\n  if (category === 'AI Governance') {\n    return `Dieses Signal ist für AI Governance relevant, weil es auf Veränderungen bei Führung, Kontrolle, Regulierung, Sicherheit oder Vertrauen im KI-Markt hinweist: ${title}`;\n  }\n\n  if (category === 'AI Infrastructure') {\n    return `Dieses Signal ist für AI Infrastructure relevant, weil es auf neue Investitionen, Chip-Kapazitäten, Rechenleistung oder technische Grundlagen für KI-Systeme hinweist: ${title}`;\n  }\n\n  if (category === 'AI Workflows') {\n    return `Dieses Signal ist für AI Workflows relevant, weil es auf neue Automatisierungsmöglichkeiten, Agenten-Systeme oder produktivere KI-Prozessketten hinweist: ${title}`;\n  }\n\n  if (category === 'AI Tools') {\n    return `Dieses Signal ist für AI Tools relevant, weil es auf neue Plattformen, APIs, Entwicklerwerkzeuge oder produktnahe KI-Anwendungen hinweist: ${title}`;\n  }\n\n  return `Dieses Signal ist für die KI-Marktbeobachtung relevant, weil es auf mögliche Veränderungen bei KI-Unternehmen, Produkten, Infrastruktur oder Marktstrategien hinweist: ${title}`;\n}\n\nconst relevantItems = items.filter(isRelevant);\n\nreturn relevantItems.map((item) => {\n  const title = cleanText(item.json.title || 'Unbenannter RSS-Trend');\n  const link = item.json.link || '';\n  const pubDate = item.json.pubDate || item.json.isoDate || '';\n  const text = getText(item);\n\n  const cleanSummary = cleanText(\n    item.json.contentSnippet ||\n    item.json.summary ||\n    item.json.content ||\n    title\n  );\n\n  const score = getScore(text);\n  const category = getCategory(text);\n  const status = score >= 80 ? 'Hohe Relevanz' : 'Beobachten';\n\n  return {\n    json: {\n      id: slugify(link || title),\n      name: title,\n      category,\n      status,\n      score,\n      businessImpact: getBusinessImpact(category, title),\n      summary: cleanSummary.slice(0, 350),\n      recommendation: getRecommendation(score, category),\n      source: 'The Verge RSS',\n      timeframe: pubDate ? 'RSS Import' : 'Unbekannt',\n      signalType: 'RSS'\n    }\n  };\n});"
+      },
+      "id": "f61fc4b6-5b54-42b1-853e-2f7407e9c132",
+      "name": "RSS-Daten in Trend-Kandidaten umwandeln",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const requiredFields = [\n  'id',\n  'name',\n  'category',\n  'status',\n  'score',\n  'businessImpact',\n  'summary',\n  'recommendation',\n  'source',\n  'timeframe',\n  'signalType'\n];\n\nreturn items.map((item) => {\n  const normalized = {};\n\n  for (const field of requiredFields) {\n    normalized[field] = item.json[field] ?? '';\n  }\n\n  normalized.id = String(normalized.id || '').trim();\n  normalized.name = String(normalized.name || '').trim();\n  normalized.category = String(normalized.category || 'AI News').trim();\n  normalized.status = String(normalized.status || 'Neu').trim();\n  normalized.score = Math.max(0, Math.min(100, Number(normalized.score) || 0));\n\n  return { json: normalized };\n}).filter((item) => item.json.id && item.json.name);"
+      },
+      "id": "1b6b9e09-4cf3-462c-ba85-4510b60edf90",
+      "name": "Trend-Daten normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "trends",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "cddb02fa-b7be-40c4-9513-14d3979d9c9a",
+      "name": "Bestehende Trends lesen",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1200,
+        192
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "8OCTDflTN4pK95W9",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidates = $('Trend-Daten normalisieren').all();\nconst existingRows = $('Bestehende Trends lesen').all();\n\nconst existingIds = new Set(\n  existingRows\n    .map((item) => String(item.json.id || '').trim())\n    .filter(Boolean)\n);\n\nconst newTrends = candidates.filter((item) => {\n  const id = String(item.json.id || '').trim();\n  return id && !existingIds.has(id);\n});\n\nreturn newTrends;"
+      },
+      "id": "12a5007a-0260-4ed8-b071-f97d65442e81",
+      "name": "Nur neue Trends filtern",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "trends",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "businessImpact",
+              "displayName": "businessImpact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "recommendation",
+              "displayName": "recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timeframe",
+              "displayName": "timeframe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "signalType",
+              "displayName": "signalType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "23831c9a-8852-45f9-af0e-8944293966e0",
+      "name": "Neue Trends in Google Sheets schreiben",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1632,
+        0
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "8OCTDflTN4pK95W9",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCXZCJLdBC09xxGZ6gcdrc6A",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9abb7e10-d688-446c-b4c0-becedda7eb3d",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        416,
+        192
+      ],
+      "id": "53638b63-9ce1-4fde-a7f2-ba882cc5b232",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst sourceConfig = {\n  name: 'YouTube – OpenAI',\n  sourceQuality: 100,\n  sourceType: 'official_ai_channel',\n  signalType: 'YouTube',\n  defaultCategory: 'AI News',\n  maxItems: 5\n};\n\nfunction asArray(value) {\n  if (!value) return [];\n  return Array.isArray(value) ? value : [value];\n}\n\nfunction cleanText(value) {\n  return String(value || '')\n    .replace(/<script[\\s\\S]*?<\\/script>/gi, ' ')\n    .replace(/<style[\\s\\S]*?<\\/style>/gi, ' ')\n    .replace(/<[^>]*>/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&quot;/g, '\"')\n    .replace(/&apos;/g, \"'\")\n    .replace(/&#39;/g, \"'\")\n    .replace(/&#8217;/g, '’')\n    .replace(/&#8216;/g, '‘')\n    .replace(/&#8220;/g, '“')\n    .replace(/&#8221;/g, '”')\n    .replace(/&#8230;/g, '…')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction slugify(value) {\n  return cleanText(value)\n    .toLowerCase()\n    .replace(/https?:\\/\\//g, '')\n    .replace(/[^a-z0-9]+/g, '-')\n    .replace(/^-+|-+$/g, '')\n    .slice(0, 90);\n}\n\nfunction getLink(entry) {\n  const links = asArray(entry.link);\n\n  const alternate = links.find((link) => link.rel === 'alternate' && link.href);\n  if (alternate?.href) return alternate.href;\n\n  const firstWithHref = links.find((link) => link.href);\n  return firstWithHref?.href || '';\n}\n\nfunction getVideoId(entry, link) {\n  if (entry['yt:videoId']) return String(entry['yt:videoId']).trim();\n\n  const match = String(link || '').match(/[?&]v=([^&]+)/);\n  return match ? match[1] : '';\n}\n\nfunction getMediaGroup(entry) {\n  return entry['media:group'] || entry.mediaGroup || {};\n}\n\nfunction getDescription(entry) {\n  const mediaGroup = getMediaGroup(entry);\n\n  return cleanText(\n    mediaGroup['media:description'] ||\n    mediaGroup.description ||\n    entry.summary ||\n    entry.content ||\n    entry.title ||\n    ''\n  );\n}\n\nfunction getPublishedTimestamp(entry) {\n  const dateValue = entry.published || entry.updated || '';\n  const timestamp = Date.parse(dateValue);\n  return Number.isNaN(timestamp) ? 0 : timestamp;\n}\n\nfunction getCategory(text) {\n  const lower = text.toLowerCase();\n\n  if (\n    lower.includes('codex') ||\n    lower.includes('developer') ||\n    lower.includes('api') ||\n    lower.includes('agent') ||\n    lower.includes('agents') ||\n    lower.includes('automation')\n  ) {\n    return 'AI Tools';\n  }\n\n  if (\n    lower.includes('sora') ||\n    lower.includes('video') ||\n    lower.includes('image') ||\n    lower.includes('multimodal') ||\n    lower.includes('voice') ||\n    lower.includes('audio')\n  ) {\n    return 'AI Product Demo';\n  }\n\n  if (\n    lower.includes('safety') ||\n    lower.includes('alignment') ||\n    lower.includes('research') ||\n    lower.includes('model') ||\n    lower.includes('benchmark')\n  ) {\n    return 'AI Research';\n  }\n\n  if (\n    lower.includes('enterprise') ||\n    lower.includes('business') ||\n    lower.includes('workflow') ||\n    lower.includes('productivity')\n  ) {\n    return 'AI Workflows';\n  }\n\n  return sourceConfig.defaultCategory;\n}\n\nfunction getScore(text, category) {\n  const lower = text.toLowerCase();\n  let score = 76;\n\n  score += Math.round(sourceConfig.sourceQuality / 10);\n\n  if (lower.includes('openai')) score += 8;\n  if (lower.includes('chatgpt')) score += 8;\n  if (lower.includes('codex')) score += 10;\n  if (lower.includes('agent') || lower.includes('agents')) score += 8;\n  if (lower.includes('api') || lower.includes('developer')) score += 6;\n  if (lower.includes('sora') || lower.includes('video')) score += 6;\n  if (lower.includes('research') || lower.includes('model')) score += 5;\n  if (lower.includes('enterprise') || lower.includes('business')) score += 5;\n\n  if (category === 'AI Tools') score += 4;\n  if (category === 'AI Product Demo') score += 3;\n  if (category === 'AI Research') score += 3;\n\n  return Math.max(60, Math.min(score, 98));\n}\n\nfunction getBusinessImpact(category, title) {\n  if (category === 'AI Tools') {\n    return `Dieses YouTube-Signal ist für AI Tools relevant, weil es auf neue Funktionen, Entwicklerwerkzeuge, Agenten oder produktnahe KI-Anwendungen hinweist: ${title}`;\n  }\n\n  if (category === 'AI Product Demo') {\n    return `Dieses YouTube-Signal ist für AI Product Demo relevant, weil es offizielle Produktfunktionen, Demos oder neue Anwendungsmöglichkeiten sichtbar macht: ${title}`;\n  }\n\n  if (category === 'AI Research') {\n    return `Dieses YouTube-Signal ist für AI Research relevant, weil es Hinweise auf neue Modelle, Forschungsergebnisse, Sicherheitsfragen oder technische Fortschritte liefert: ${title}`;\n  }\n\n  if (category === 'AI Workflows') {\n    return `Dieses YouTube-Signal ist für AI Workflows relevant, weil es auf neue Automatisierungs- oder Produktivitätsmöglichkeiten mit KI hinweist: ${title}`;\n  }\n\n  return `Dieses YouTube-Signal ist für die KI-Marktbeobachtung relevant, weil es von einer offiziellen KI-Quelle stammt und auf neue Entwicklungen im OpenAI-Ökosystem hinweist: ${title}`;\n}\n\nfunction getRecommendation(score, category) {\n  if (score >= 85) {\n    return `Für das Trend-Radar priorisieren und prüfen, ob daraus ein konkreter Use Case im Bereich ${category} entsteht.`;\n  }\n\n  if (score >= 75) {\n    return `Beobachten und mit weiteren Quellen abgleichen, ob sich das YouTube-Signal im Bereich ${category} verstärkt.`;\n  }\n\n  return `Nur als schwaches YouTube-Signal beobachten und erst priorisieren, wenn weitere Quellen das Thema bestätigen.`;\n}\n\nconst output = [];\n\nfor (const item of items) {\n  const feed = item.json.feed || {};\n  const entries = asArray(feed.entry)\n    .sort((a, b) => getPublishedTimestamp(b) - getPublishedTimestamp(a))\n    .slice(0, sourceConfig.maxItems);\n\n  for (const entry of entries) {\n    const title = cleanText(entry.title || getMediaGroup(entry)['media:title'] || 'Unbenanntes YouTube-Signal');\n    const link = getLink(entry);\n    const videoId = getVideoId(entry, link);\n    const description = getDescription(entry);\n    const published = entry.published || entry.updated || '';\n\n    const combinedText = cleanText(`${title} ${description}`);\n    const category = getCategory(combinedText);\n    const score = getScore(combinedText, category);\n    const status = score >= 80 ? 'Hohe Relevanz' : 'Beobachten';\n\n    output.push({\n      json: {\n        id: slugify(videoId || link || title),\n        name: title,\n        category,\n        status,\n        score,\n        businessImpact: getBusinessImpact(category, title),\n        summary: description.slice(0, 350) || title,\n        recommendation: getRecommendation(score, category),\n        source: sourceConfig.name,\n        timeframe: published ? 'YouTube Upload' : 'Unbekannt',\n        signalType: sourceConfig.signalType\n      }\n    });\n  }\n}\n\nreturn output.filter((item) => item.json.id && item.json.name);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        192
+      ],
+      "id": "4aac9156-e097-476a-9216-328362bd9c92",
+      "name": "YouTube-Daten in Trend-Kandidaten umwandeln"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed per HTTP lesen": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS-Daten in Trend-Kandidaten umwandeln": {
+      "main": [
+        []
+      ]
+    },
+    "Trend-Daten normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Bestehende Trends lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nur neue Trends filtern": {
+      "main": [
+        [
+          {
+            "node": "Neue Trends in Google Sheets schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "RSS-Daten in Trend-Kandidaten umwandeln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bestehende Trends lesen": {
+      "main": [
+        [
+          {
+            "node": "Nur neue Trends filtern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "YouTube-Daten in Trend-Kandidaten umwandeln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube-Daten in Trend-Kandidaten umwandeln": {
+      "main": [
+        [
+          {
+            "node": "Trend-Daten normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6c07a9c5-ad76-4391-87eb-c2ff7b120c2f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "418e3b99acfe2aad5174d079763a7e217ac6723a96fb2cfbcde2563f7db8ec9b"
+  },
+  "id": "dAwq7xnAQ11eDzaU",
+  "tags": [
+    {
+      "updatedAt": "2026-05-07T10:13:52.024Z",
+      "createdAt": "2026-05-07T10:13:52.024Z",
+      "id": "MxYT9VHOrvzzmSVh",
+      "name": "blueprint"
+    },
+    {
+      "updatedAt": "2026-05-07T10:13:52.035Z",
+      "createdAt": "2026-05-07T10:13:52.035Z",
+      "id": "n3msZ5vmGb6ti2ku",
+      "name": "rss-test"
+    }
+  ]
+}
