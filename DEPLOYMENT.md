@@ -38,6 +38,15 @@ Die Online-API `/api/trends` liefert erfolgreich:
 - `count`
 - `trends`
 
+Aktueller Live-Status:
+
+- `source`: `google_sheets`
+- `count`: 7 Trends
+- Google Sheets ist live angebunden.
+- Vercel Environment Variables sind gesetzt.
+- Mock-Daten bleiben als Fallback im Code erhalten.
+- Keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien ins Repository schreiben.
+
 ## Lokale Entwicklung
 
 ```powershell
@@ -72,6 +81,8 @@ Routen:
 Aktuell wird der kostenlose GitHub-Free- und Vercel-Hobby/Free-Workflow genutzt.
 Keine kostenpflichtigen Zusatzfunktionen wurden aktiviert.
 Weiterhin GitHub Free + Vercel Hobby/Free.
+Keine kostenpflichtigen Dienste sind aktiv.
+Kein Schedule Trigger ist aktiv.
 
 Nicht aktivieren:
 
@@ -83,8 +94,15 @@ Nicht aktivieren:
 
 ## Datenstatus
 
-Das Dashboard lädt aktuell Mock-Daten über die interne API `/api/trends`.
-Später können n8n, Google Sheets, Supabase oder eine externe API angebunden werden.
+Das Dashboard lädt aktuell echte Google-Sheet-Daten über die interne API `/api/trends`.
+Die Datenquelle im Dashboard ist `google_sheets`.
+Aktuell werden 7 Trends geladen.
+Dashboard-Statistiken werden dynamisch aus den echten Trends berechnet.
+Das Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
+
+Der n8n RSS-Testworkflow funktioniert manuell. RSS-Filterlogik, Scoring und Duplikat-Schutz über `id` funktionieren. Die aktuelle sichere Exportdatei heißt `n8n-trendpilot-rss-current.json` und wurde auf `private_key` geprüft. Es wurde kein `private_key` gefunden.
+
+Später können weitere RSS-Quellen ergänzt werden. Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünscht ist.
 
 ## Deployment-Ablauf
 

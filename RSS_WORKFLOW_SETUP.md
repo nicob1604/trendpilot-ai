@@ -6,6 +6,16 @@ Der RSS-Testzweig soll vorbereiten, wie TrendPilot AI später echte KI-Trends, T
 
 Der RSS-Testworkflow `TrendPilot AI – RSS Test Branch` funktioniert inzwischen manuell. Es ist weiterhin kein produktiver automatischer RSS-Import aktiv.
 
+Aktueller MVP-Stand:
+
+- Landingpage und Dashboard funktionieren live auf Vercel.
+- `/api/trends` liest echte Google-Sheet-Daten.
+- Datenquelle im Dashboard ist `google_sheets`.
+- Aktuell werden 7 Trends geladen.
+- Dashboard-Statistiken werden dynamisch aus echten Trends berechnet.
+- Vercel Environment Variables sind gesetzt.
+- Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
+
 ## 2. Geplanter Ablauf
 
 Manual Trigger -> RSS Feed lesen -> RSS-Daten in Trend-Kandidaten umwandeln -> Trend-Daten normalisieren -> Bestehende Trends lesen -> Nur neue Trends filtern -> Neue Trends in Google Sheets schreiben
@@ -87,11 +97,15 @@ Der manuelle Test hat bestätigt:
 - RSS-Daten werden in Trend-Kandidaten umgewandelt.
 - Die Trend-Daten werden normalisiert.
 - Google Sheets wird über den Google Service Account gelesen und beschrieben.
+- RSS-Filterlogik und Scoring wurden verbessert.
+- Neue RSS-Trends wurden erfolgreich ins Google Sheet geschrieben.
+- Ein zweiter Lauf hat keine Duplikate geschrieben.
+- Duplikat-Schutz funktioniert über `id`.
 - Der aktuelle Workflow läuft weiterhin nur manuell.
 - Es ist kein Schedule Trigger aktiv.
 - Der sichere Workflow-Export heißt `n8n-trendpilot-rss-current.json`.
 - Die Datei wurde auf `private_key` geprüft und enthält keinen Google-Service-Account-Private-Key.
-- Das Dashboard nutzt weiterhin Mock-Daten über `/api/trends`.
+- Das Dashboard nutzt echte Google-Sheet-Daten über `/api/trends`.
 
 ## 7. Hinweise
 
@@ -100,12 +114,14 @@ Der manuelle Test hat bestätigt:
 - Es werden keine kostenpflichtigen Dienste genutzt.
 - Es ist noch kein produktiver automatischer RSS-Import aktiv.
 - Keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien committen.
-- Die bestehende App nutzt weiterhin Mock-Daten über `/api/trends`.
+- Die bestehende App nutzt echte Google-Sheet-Daten über `/api/trends`.
 - Es gibt keine Änderung an `/api/trends`.
 - Es gibt keine Änderung am Dashboard.
 - Es gibt keine Änderung an der Landingpage.
+- Keine kostenpflichtigen Dienste sind aktiv.
+- Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünscht ist.
 
-Der nächste große Schritt nach dieser Dokumentation ist die Umstellung von `/api/trends` auf echte Google-Sheet-Daten mit Mock-Daten als Fallback.
+Der nächste mögliche Schritt nach dieser Dokumentation ist, weitere RSS-Quellen zu ergänzen oder optional später einen Schedule Trigger zu aktivieren.
 
 ## 8. Google-Sheet-Ziel
 

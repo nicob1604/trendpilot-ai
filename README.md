@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TrendPilot AI
 
-## Getting Started
+TrendPilot AI ist ein Next.js MVP für eine moderne AI-Trend-Radar-Landingpage mit Dashboard und interner Trend-API.
 
-First, run the development server:
+## Live-URLs
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Startseite: https://trendpilot-ai-two.vercel.app/
+- Dashboard: https://trendpilot-ai-two.vercel.app/dashboard
+- API: https://trendpilot-ai-two.vercel.app/api/trends
+
+## Aktueller MVP-Status
+
+- Landingpage funktioniert live auf Vercel.
+- Dashboard funktioniert live.
+- Der obere Dashboard-Button auf der Landingpage führt korrekt zu `/dashboard`.
+- `/api/trends` liest echte Daten aus Google Sheets.
+- Datenquelle im Dashboard ist `google_sheets`.
+- Aktuell werden 7 Trends aus Google Sheets geladen.
+- Dashboard-Statistiken werden dynamisch aus den echten Trends berechnet.
+- Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
+- Icon/Favicon und Metadata sind ergänzt.
+- GitHub und Vercel sind aktuell.
+
+## Datenquelle
+
+Das Dashboard lädt seine Daten über:
+
+```ts
+fetch("/api/trends")
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Die API liefert weiterhin dieses Format:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```json
+{
+  "source": "google_sheets",
+  "updatedAt": "2026-05-09T00:00:00.000Z",
+  "count": 7,
+  "trends": []
+}
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Google Sheets ist live angebunden. Die Vercel Environment Variables sind gesetzt. Es dürfen keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien ins Repository geschrieben werden.
 
-## Learn More
+Öffentliche Sheet-ID:
 
-To learn more about Next.js, take a look at the following resources:
+```text
+1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Tabellenblatt:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+trends
+```
 
-## Deploy on Vercel
+## n8n RSS-Testworkflow
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Der n8n RSS-Testworkflow `TrendPilot AI – RSS Test Branch` funktioniert manuell.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- RSS-Filterlogik und Scoring wurden verbessert.
+- Duplikat-Schutz funktioniert über `id`.
+- Neue Workflow-Exportdatei: `n8n-trendpilot-rss-current.json`
+- Die Exportdatei wurde auf `private_key` geprüft.
+- Es wurde kein `private_key` gefunden.
+- Der Workflow läuft aktuell nur manuell.
+- Es ist kein Schedule Trigger aktiv.
+
+Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünscht ist.
+
+## Kostenstatus
+
+Das Projekt bleibt kostenlos.
+
+- GitHub Free bleibt aktiv.
+- Vercel Hobby/Free bleibt aktiv.
+- Keine kostenpflichtigen Dienste sind aktiv.
+- Keine kostenpflichtige Domain ist aktiv.
+- Keine kostenpflichtigen Datenbanken oder APIs sind aktiv.
+- Keine Vercel-Pro- oder Vercel-Agent-Funktionen aktivieren.
+
+## Lokale Entwicklung
+
+```powershell
+cd C:\Users\NicoBrandt\trendpilot-ai
+npm.cmd run dev
+```
+
+Lokale URL:
+
+```text
+http://localhost:3000
+```
+
+## Build
+
+```powershell
+npm.cmd run build
+```
+
+## Nächste mögliche Schritte
+
+- Weitere RSS-Quellen ergänzen.
+- Optional später einen Schedule Trigger in n8n aktivieren.
+- Schedule Trigger nur aktivieren, wenn ausdrücklich gewünscht.
+- Datenqualität im Google Sheet weiter verbessern.

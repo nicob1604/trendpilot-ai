@@ -23,11 +23,18 @@ https://trendpilot-ai-two.vercel.app
 - Landingpage vorhanden
 - Dashboard vorhanden
 - Interne API vorhanden
-- Mock-Daten über `/api/trends`
+- `/api/trends` liest echte Daten aus Google Sheets
 - Build erfolgreich getestet
 - Startseite funktioniert online
 - Dashboard funktioniert online
 - API funktioniert online
+- Der obere Dashboard-Button auf der Landingpage führt korrekt zu `/dashboard`
+- Datenquelle im Dashboard ist `google_sheets`
+- Aktuell werden 7 Trends aus Google Sheets geladen
+- Dashboard-Statistiken werden dynamisch aus echten Trends berechnet
+- Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt
+- Icon/Favicon und Metadata wurden ergänzt
+- GitHub und Vercel sind aktuell
 
 ## Wichtige Routen
 
@@ -49,6 +56,13 @@ Die Online-API `/api/trends` liefert erfolgreich:
 - `updatedAt`
 - `count`
 - `trends`
+
+Aktueller Live-Status:
+
+- `source`: `google_sheets`
+- `count`: 7 Trends
+- Google Sheets ist live angebunden
+- Vercel Environment Variables sind gesetzt
 
 ## Wichtige Dateien
 
@@ -77,8 +91,9 @@ Die Online-API `/api/trends` liefert erfolgreich:
 
 ## Datenstatus
 
-Aktuell Mock-Daten.
-Später vorbereitet für n8n, Google Sheets, Supabase oder externe API.
+Aktuell echte Google-Sheet-Daten über `/api/trends`.
+Mock-Daten bleiben als Fallback im Code erhalten.
+Später vorbereitet für weitere RSS-Quellen, n8n-Erweiterungen, Supabase oder externe APIs.
 
 ## Geplante Google-Sheet-Datenquelle
 
@@ -89,10 +104,10 @@ https://docs.google.com/spreadsheets/d/1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6
 - Spreadsheet-ID: `1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo`
 - Tabellenblatt: `trends`
 - gid: `29451432`
-- Status: Das Google Sheet wurde erstellt und enthält bereits die Header-Zeile mit allen benötigten Trend-Feldern.
-- Erster Test-Trend: `Agentic Workflows`
+- Status: Das Google Sheet ist live angebunden, bereinigt und enthält aktuell 7 Trends.
+- Backup-Tab: erstellt.
 
-Die App nutzt aktuell noch Mock-Daten über `/api/trends`. Es wurde noch keine echte Google-Sheets-Anbindung umgesetzt. Später soll `/api/trends` die Daten aus diesem Sheet oder über n8n beziehen.
+Die App nutzt aktuell echte Google-Sheet-Daten über `/api/trends`. Vercel Environment Variables sind gesetzt. Es dürfen keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien ins Repository geschrieben werden.
 
 ## n8n-Workflow-Status
 
@@ -147,11 +162,13 @@ Sicherheits- und Betriebsstatus:
 - Der sichere Workflow-Export heißt `n8n-trendpilot-rss-current.json`.
 - Die Datei wurde auf `private_key` geprüft und enthält keinen Google-Service-Account-Private-Key.
 - Keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien committen.
-- Das Dashboard nutzt weiterhin Mock-Daten über `/api/trends`.
+- RSS-Filterlogik und Scoring wurden verbessert.
+- Das Dashboard nutzt echte Google-Sheet-Daten über `/api/trends`.
 
 Nächster großer Schritt:
 
-`/api/trends` auf echte Google-Sheet-Daten umstellen, mit Mock-Daten als Fallback.
+Weitere RSS-Quellen ergänzen oder optional später einen Schedule Trigger aktivieren.
+Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünscht ist.
 
 ## Build-Status
 
@@ -166,6 +183,7 @@ Keine kostenpflichtigen Dienste aktivieren.
 n8n-Test läuft nur manuell.
 RSS-Testworkflow läuft nur manuell.
 Es ist kein Schedule Trigger aktiv.
+Keine kostenpflichtigen Dienste sind aktiv.
 
 Nicht aktivieren:
 
@@ -178,5 +196,7 @@ Nicht aktivieren:
 ## Nächste mögliche Schritte
 
 - Vercel-Projekt weiter beobachten
+- Weitere RSS-Quellen ergänzen
+- Optional später einen Schedule Trigger aktivieren
+- Schedule Trigger nur aktivieren, wenn ausdrücklich gewünscht
 - Domain vorbereiten, aber keine kostenpflichtige Domain aktivieren
-- echte Datenquelle anbinden
