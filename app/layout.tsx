@@ -3,7 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "TrendPilot AI",
-  description: "Discover, analyze and act on AI trends before they go mainstream.",
+  description: "Navigate Trends. Outsmart Tomorrow.",
+  icons: {
+    icon: "/trendpilot-icon.svg",
+    shortcut: "/trendpilot-icon.svg",
+  },
 };
 
 export default function RootLayout({
