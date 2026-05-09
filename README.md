@@ -16,6 +16,7 @@ TrendPilot AI ist ein Next.js MVP für eine moderne AI-Trend-Radar-Landingpage m
 - `/api/trends` liest echte Daten aus Google Sheets.
 - Datenquelle im Dashboard ist `google_sheets`.
 - Aktuell werden 7 Trends aus Google Sheets geladen.
+- Nach dem YouTube-RSS-Test zeigt das Dashboard aktuell 12 Signale.
 - Dashboard-Statistiken werden dynamisch aus den echten Trends berechnet.
 - Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
 - Icon/Favicon und Metadata sind ergänzt.
@@ -68,6 +69,45 @@ Der n8n RSS-Testworkflow `TrendPilot AI – RSS Test Branch` funktioniert manuel
 
 Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünscht ist.
 
+## n8n YouTube-RSS-Testworkflow
+
+Der separate n8n-Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde erfolgreich manuell getestet.
+
+- YouTube-RSS ist als neue Quellenart erfolgreich getestet.
+- YouTube wurde nicht über die YouTube Data API angebunden.
+- Stattdessen wird YouTube per Channel-RSS genutzt.
+- Es werden keine neuen API-Keys benötigt.
+- Es wurden keine neuen Secrets angelegt.
+- Keine kostenpflichtigen Dienste wurden aktiviert.
+- Kein Schedule Trigger ist aktiv.
+- Der Workflow läuft weiterhin nur manuell.
+- OpenAI wurde als erste offizielle YouTube-Quelle getestet.
+- Feed wird per HTTP gelesen.
+- Feed-XML wird über XML to JSON umgewandelt.
+- YouTube-Daten werden in Trend-Kandidaten umgewandelt und normalisiert.
+- Die Ausgabe ist bewusst auf die 5 neuesten Videos begrenzt.
+- Duplikate werden über `id` geprüft.
+- 5 neue YouTube-Trends wurden erfolgreich ins Google Sheet geschrieben.
+- `/api/trends` liest die neuen YouTube-Trends aus Google Sheets.
+- Dashboard zeigt jetzt 12 Signale.
+- `signalType`: `YouTube`
+- `source`: `YouTube – OpenAI`
+- Gesicherte Exportdatei: `n8n-trendpilot-youtube-current.json`
+- Die Exportdatei wurde auf `private_key` geprüft.
+- Es wurde kein `private_key` gefunden.
+- Die Datei wurde committed und gepusht.
+
+Weitere mögliche YouTube-Quellen für später:
+
+- Google DeepMind
+- Microsoft Developer
+- NVIDIA Developer
+- Hugging Face
+- AI at Meta
+- Niklas Steenfatt
+- Christoph Magnussen
+- Everlast AI
+
 ## Kostenstatus
 
 Das Projekt bleibt kostenlos.
@@ -78,6 +118,7 @@ Das Projekt bleibt kostenlos.
 - Keine kostenpflichtige Domain ist aktiv.
 - Keine kostenpflichtigen Datenbanken oder APIs sind aktiv.
 - Keine Vercel-Pro- oder Vercel-Agent-Funktionen aktivieren.
+- Keine YouTube API Keys nötig.
 
 ## Lokale Entwicklung
 
@@ -101,6 +142,7 @@ npm.cmd run build
 ## Nächste mögliche Schritte
 
 - Weitere RSS-Quellen ergänzen.
+- Weitere YouTube-Quellen ergänzen.
 - Optional später einen Schedule Trigger in n8n aktivieren.
 - Schedule Trigger nur aktivieren, wenn ausdrücklich gewünscht.
 - Datenqualität im Google Sheet weiter verbessern.

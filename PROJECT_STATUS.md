@@ -31,6 +31,7 @@ https://trendpilot-ai-two.vercel.app
 - Der obere Dashboard-Button auf der Landingpage führt korrekt zu `/dashboard`
 - Datenquelle im Dashboard ist `google_sheets`
 - Aktuell werden 7 Trends aus Google Sheets geladen
+- Nach dem YouTube-RSS-Test zeigt das Dashboard aktuell 12 Signale
 - Dashboard-Statistiken werden dynamisch aus echten Trends berechnet
 - Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt
 - Icon/Favicon und Metadata wurden ergänzt
@@ -61,6 +62,7 @@ Aktueller Live-Status:
 
 - `source`: `google_sheets`
 - `count`: 7 Trends
+- YouTube-RSS-Testdaten erhöhen den sichtbaren Dashboard-Stand aktuell auf 12 Signale
 - Google Sheets ist live angebunden
 - Vercel Environment Variables sind gesetzt
 
@@ -170,6 +172,54 @@ Nächster großer Schritt:
 Weitere RSS-Quellen ergänzen oder optional später einen Schedule Trigger aktivieren.
 Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünscht ist.
 
+## n8n-YouTube-RSS-Testworkflow-Status
+
+Der separate Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde erfolgreich manuell getestet.
+
+Testdetails:
+
+- YouTube wurde nicht über die YouTube Data API angebunden.
+- YouTube wird per Channel-RSS genutzt.
+- Es werden keine neuen API-Keys benötigt.
+- Es wurden keine neuen Secrets angelegt.
+- Getestete Quelle: YouTube – OpenAI.
+- Der Feed wird per HTTP gelesen.
+- Feed-XML wird über XML to JSON umgewandelt.
+- Danach werden YouTube-Daten in Trend-Kandidaten umgewandelt.
+- Die Ausgabe ist bewusst auf die 5 neuesten Videos begrenzt.
+- Die Daten werden normalisiert.
+- Duplikate werden über `id` geprüft.
+- 5 neue YouTube-Trends wurden erfolgreich ins Google Sheet geschrieben.
+- `/api/trends` liest die neuen YouTube-Trends aus Google Sheets.
+- Dashboard zeigt jetzt 12 Signale.
+- `signalType`: `YouTube`
+- `source`: `YouTube – OpenAI`
+
+Sicherheits- und Betriebsstatus:
+
+- Der YouTube-Test ist aktuell manuell.
+- Kein Schedule Trigger ist aktiv.
+- Keine YouTube API wird genutzt.
+- Keine zusätzlichen Kosten.
+- Keine kostenpflichtigen Dienste wurden aktiviert.
+- Der Workflow ist als separater Test-Branch gespeichert.
+- Gesicherte Exportdatei: `n8n-trendpilot-youtube-current.json`
+- Die Datei wurde auf `private_key` geprüft.
+- Es wurde kein `private_key` gefunden.
+- Die Datei wurde committed und gepusht.
+- Keine Secrets, Private Keys oder geheimen Environment-Variable-Werte dokumentieren.
+
+Weitere mögliche YouTube-Quellen für später:
+
+- Google DeepMind
+- Microsoft Developer
+- NVIDIA Developer
+- Hugging Face
+- AI at Meta
+- Niklas Steenfatt
+- Christoph Magnussen
+- Everlast AI
+
 ## Build-Status
 
 `npm.cmd run build` wurde erfolgreich ausgeführt.
@@ -182,6 +232,7 @@ Keine kostenpflichtigen Zusatzfunktionen wurden aktiviert.
 Keine kostenpflichtigen Dienste aktivieren.
 n8n-Test läuft nur manuell.
 RSS-Testworkflow läuft nur manuell.
+YouTube-RSS-Testworkflow läuft nur manuell.
 Es ist kein Schedule Trigger aktiv.
 Keine kostenpflichtigen Dienste sind aktiv.
 
@@ -197,6 +248,7 @@ Nicht aktivieren:
 
 - Vercel-Projekt weiter beobachten
 - Weitere RSS-Quellen ergänzen
+- Weitere YouTube-Quellen ergänzen
 - Optional später einen Schedule Trigger aktivieren
 - Schedule Trigger nur aktivieren, wenn ausdrücklich gewünscht
 - Domain vorbereiten, aber keine kostenpflichtige Domain aktivieren

@@ -42,6 +42,7 @@ Aktueller Live-Status:
 
 - `source`: `google_sheets`
 - `count`: 7 Trends
+- Nach dem YouTube-RSS-Test zeigt das Dashboard aktuell 12 Signale.
 - Google Sheets ist live angebunden.
 - Vercel Environment Variables sind gesetzt.
 - Mock-Daten bleiben als Fallback im Code erhalten.
@@ -97,12 +98,30 @@ Nicht aktivieren:
 Das Dashboard lädt aktuell echte Google-Sheet-Daten über die interne API `/api/trends`.
 Die Datenquelle im Dashboard ist `google_sheets`.
 Aktuell werden 7 Trends geladen.
+Nach dem YouTube-RSS-Test zeigt das Dashboard aktuell 12 Signale.
 Dashboard-Statistiken werden dynamisch aus den echten Trends berechnet.
 Das Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
 
 Der n8n RSS-Testworkflow funktioniert manuell. RSS-Filterlogik, Scoring und Duplikat-Schutz über `id` funktionieren. Die aktuelle sichere Exportdatei heißt `n8n-trendpilot-rss-current.json` und wurde auf `private_key` geprüft. Es wurde kein `private_key` gefunden.
 
-Später können weitere RSS-Quellen ergänzt werden. Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünscht ist.
+Der separate YouTube-RSS-Testworkflow `TrendPilot AI – YouTube RSS Test Branch` funktioniert manuell. YouTube wurde nicht über die YouTube Data API angebunden, sondern kostenlos per Channel-RSS. OpenAI wurde als erste offizielle YouTube-Quelle getestet. Die Ausgabe ist bewusst auf die 5 neuesten Videos begrenzt. 5 neue YouTube-Trends wurden erfolgreich ins Google Sheet geschrieben. `/api/trends` liest die neuen YouTube-Trends aus Google Sheets. `signalType` ist `YouTube`, `source` ist `YouTube – OpenAI`.
+
+Gesicherte YouTube-Exportdatei: `n8n-trendpilot-youtube-current.json`. Die Datei wurde auf `private_key` geprüft. Es wurde kein `private_key` gefunden. Die Datei wurde committed und gepusht.
+
+Für YouTube-RSS werden keine neuen API-Keys, keine neuen Secrets und keine kostenpflichtigen Dienste benötigt. Kein Schedule Trigger ist aktiv.
+
+Später können weitere RSS- oder YouTube-Quellen ergänzt werden. Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünscht ist.
+
+Mögliche spätere YouTube-Quellen:
+
+- Google DeepMind
+- Microsoft Developer
+- NVIDIA Developer
+- Hugging Face
+- AI at Meta
+- Niklas Steenfatt
+- Christoph Magnussen
+- Everlast AI
 
 ## Deployment-Ablauf
 
