@@ -371,25 +371,28 @@ export default function DashboardPage() {
         </section>
 
         <section className="mb-6 rounded-2xl border border-white/8 bg-[#121826]/60 p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#AEB7C2]/70">
+          <label
+            htmlFor="source-filter"
+            className="mb-3 block text-xs font-semibold uppercase tracking-[0.18em] text-[#AEB7C2]/70"
+          >
             Quellen
-          </p>
-          <div className="flex flex-wrap gap-2">
+          </label>
+          <select
+            id="source-filter"
+            value={activeSourceFilter}
+            onChange={(event) => setActiveSourceFilter(event.target.value)}
+            className="h-11 w-full rounded-full border border-white/10 bg-[#0B0F14]/80 px-4 text-sm font-semibold text-white outline-none transition focus:border-[#A4C400] focus:bg-[#0B0F14] focus:ring-2 focus:ring-[#A4C400]/20 sm:max-w-md"
+          >
             {sourceFilters.map((filter) => (
-              <button
+              <option
                 key={filter.value}
-                onClick={() => setActiveSourceFilter(filter.value)}
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                  activeSourceFilter === filter.value
-                    ? "border-[#A4C400]/35 bg-[#A4C400] text-[#0B0F14]"
-                    : "border-white/10 bg-white/[0.035] text-[#AEB7C2] hover:border-[#A4C400]/45 hover:text-white"
-                }`}
-                type="button"
+                value={filter.value}
+                className="bg-[#0B0F14] text-white"
               >
                 {filter.label}
-              </button>
+              </option>
             ))}
-          </div>
+          </select>
         </section>
 
         {hasActiveFilters ? (
