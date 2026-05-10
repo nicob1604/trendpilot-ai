@@ -15,8 +15,8 @@ TrendPilot AI ist ein Next.js MVP für eine moderne AI-Trend-Radar-Landingpage m
 - Der obere Dashboard-Button auf der Landingpage führt korrekt zu `/dashboard`.
 - `/api/trends` liest echte Daten aus Google Sheets.
 - Datenquelle im Dashboard ist `google_sheets`.
-- Aktuell werden 7 Trends aus Google Sheets geladen.
-- Nach dem YouTube-RSS-Test zeigt das Dashboard aktuell 12 Signale.
+- Aktuell werden 37 Trends aus Google Sheets geladen.
+- Dashboard zeigt aktuell 37 Signale.
 - Dashboard-Statistiken werden dynamisch aus den echten Trends berechnet.
 - Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
 - Icon/Favicon und Metadata sind ergänzt.
@@ -71,7 +71,7 @@ Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünsc
 
 ## n8n YouTube-RSS-Testworkflow
 
-Der separate n8n-Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde zum YouTube-Multi-Source-Teststand erweitert und erfolgreich manuell getestet.
+Der separate n8n-Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde zum YouTube-Multi-Source-Teststand mit 6 Quellen erweitert und erfolgreich manuell getestet.
 
 - YouTube-RSS ist als Multi-Source-Quellenart erfolgreich getestet.
 - YouTube wurde nicht über die YouTube Data API angebunden.
@@ -85,21 +85,30 @@ Der separate n8n-Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde zum 
   - YouTube – OpenAI
   - YouTube – Google DeepMind
   - YouTube – NVIDIA Developer
+  - YouTube – Everlast AI
+  - YouTube – Christoph Magnussen
+  - YouTube – Niklas Steenfatt
 - YouTube-Quellen werden im Workflow konfiguriert.
+- Technischer Ablauf: Manual Trigger -> YouTube-Quellen konfigurieren -> RSS Feed per HTTP lesen -> XML zu JSON -> YouTube-Daten in Trend-Kandidaten umwandeln -> Trend-Daten normalisieren -> Bestehende Trends lesen -> Nur neue Trends filtern -> Neue Trends in Google Sheets schreiben.
 - RSS Feeds werden per HTTP gelesen.
 - Feed-XML wird über XML to JSON umgewandelt.
 - YouTube-Daten werden in Trend-Kandidaten umgewandelt und normalisiert.
-- Pro Quelle werden maximal 5 neue Videos verarbeitet.
+- Pro Quelle werden maximal 5 Videos verarbeitet.
+- 6 Quellen ergeben maximal 30 YouTube-Kandidaten pro manuellem Lauf.
 - Source-Mapping funktioniert:
   - OpenAI -> YouTube – OpenAI
   - Google DeepMind -> YouTube – Google DeepMind
   - NVIDIA Developer -> YouTube – NVIDIA Developer
+  - Everlast AI -> YouTube – Everlast AI
+  - Christoph Magnussen -> YouTube – Christoph Magnussen
+  - Niklas Steenfatt -> YouTube – Niklas Steenfatt
+- Die alten `YouTube – Unknown` Einträge wurden bereinigt.
 - Duplikate werden über `id` geprüft.
 - Google Sheet zeigt YouTube-Trends korrekt an.
 - `/api/trends` liest die neuen YouTube-Trends aus Google Sheets.
-- Dashboard zeigt jetzt 12 Signale.
+- Dashboard zeigt jetzt 37 Signale.
 - `signalType`: `YouTube`
-- `source`: `YouTube – OpenAI`, `YouTube – Google DeepMind` oder `YouTube – NVIDIA Developer`
+- `source`: korrekt gemappte YouTube-Quelle
 - Gesicherte Exportdatei: `n8n-trendpilot-youtube-current.json`
 - Die Exportdatei wurde auf `private_key` geprüft.
 - Es wurde kein `private_key` gefunden.
@@ -110,9 +119,6 @@ Weitere mögliche YouTube-Quellen für später:
 - Microsoft Developer
 - Hugging Face
 - AI at Meta
-- Everlast AI
-- Christoph Magnussen
-- Niklas Steenfatt
 
 ## Kostenstatus
 

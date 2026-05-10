@@ -30,8 +30,8 @@ https://trendpilot-ai-two.vercel.app
 - API funktioniert online
 - Der obere Dashboard-Button auf der Landingpage führt korrekt zu `/dashboard`
 - Datenquelle im Dashboard ist `google_sheets`
-- Aktuell werden 7 Trends aus Google Sheets geladen
-- Nach dem YouTube-RSS-Test zeigt das Dashboard aktuell 12 Signale
+- Aktuell werden 37 Trends aus Google Sheets geladen
+- Dashboard zeigt aktuell 37 Signale
 - Dashboard-Statistiken werden dynamisch aus echten Trends berechnet
 - Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt
 - Icon/Favicon und Metadata wurden ergänzt
@@ -61,8 +61,8 @@ Die Online-API `/api/trends` liefert erfolgreich:
 Aktueller Live-Status:
 
 - `source`: `google_sheets`
-- `count`: 7 Trends
-- YouTube-RSS-Testdaten erhöhen den sichtbaren Dashboard-Stand aktuell auf 12 Signale
+- `count`: 37 Trends
+- API und Dashboard zeigen aktuell 37 Trends
 - Google Sheets ist live angebunden
 - Vercel Environment Variables sind gesetzt
 
@@ -106,7 +106,7 @@ https://docs.google.com/spreadsheets/d/1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6
 - Spreadsheet-ID: `1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6oLo`
 - Tabellenblatt: `trends`
 - gid: `29451432`
-- Status: Das Google Sheet ist live angebunden, bereinigt und enthält aktuell 7 Trends.
+- Status: Das Google Sheet ist live angebunden, bereinigt und enthält aktuell 37 Trends.
 - Backup-Tab: erstellt.
 
 Die App nutzt aktuell echte Google-Sheet-Daten über `/api/trends`. Vercel Environment Variables sind gesetzt. Es dürfen keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien ins Repository geschrieben werden.
@@ -174,7 +174,7 @@ Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünsc
 
 ## n8n-YouTube-RSS-Testworkflow-Status
 
-Der separate Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde zum YouTube-Multi-Source-Teststand erweitert und erfolgreich manuell getestet.
+Der separate Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde zum YouTube-Multi-Source-Teststand mit 6 Quellen erweitert und erfolgreich manuell getestet.
 
 Testdetails:
 
@@ -186,11 +186,16 @@ Testdetails:
   - YouTube – OpenAI
   - YouTube – Google DeepMind
   - YouTube – NVIDIA Developer
+  - YouTube – Everlast AI
+  - YouTube – Christoph Magnussen
+  - YouTube – Niklas Steenfatt
 - YouTube-Quellen werden im Workflow konfiguriert.
+- Technischer Ablauf: Manual Trigger -> YouTube-Quellen konfigurieren -> RSS Feed per HTTP lesen -> XML zu JSON -> YouTube-Daten in Trend-Kandidaten umwandeln -> Trend-Daten normalisieren -> Bestehende Trends lesen -> Nur neue Trends filtern -> Neue Trends in Google Sheets schreiben.
 - RSS Feeds werden per HTTP gelesen.
 - Feed-XML wird über XML to JSON umgewandelt.
 - Danach werden YouTube-Daten in Trend-Kandidaten umgewandelt.
-- Pro Quelle werden maximal 5 neue Videos verarbeitet.
+- Pro Quelle werden maximal 5 Videos verarbeitet.
+- 6 Quellen ergeben maximal 30 YouTube-Kandidaten pro manuellem Lauf.
 - Die Daten werden normalisiert.
 - Bestehende Trends werden gelesen.
 - Nur neue Trends werden gefiltert.
@@ -200,11 +205,15 @@ Testdetails:
   - OpenAI -> YouTube – OpenAI
   - Google DeepMind -> YouTube – Google DeepMind
   - NVIDIA Developer -> YouTube – NVIDIA Developer
+  - Everlast AI -> YouTube – Everlast AI
+  - Christoph Magnussen -> YouTube – Christoph Magnussen
+  - Niklas Steenfatt -> YouTube – Niklas Steenfatt
+- Die alten `YouTube – Unknown` Einträge wurden bereinigt.
 - Google Sheet zeigt YouTube-Trends korrekt an.
 - `/api/trends` liest die neuen YouTube-Trends aus Google Sheets.
-- Dashboard zeigt jetzt 12 Signale.
+- Dashboard zeigt jetzt 37 Signale.
 - `signalType`: `YouTube`
-- `source`: `YouTube – OpenAI`, `YouTube – Google DeepMind` oder `YouTube – NVIDIA Developer`
+- `source`: korrekt gemappte YouTube-Quelle
 
 Sicherheits- und Betriebsstatus:
 
@@ -225,9 +234,6 @@ Weitere mögliche YouTube-Quellen für später:
 - Microsoft Developer
 - Hugging Face
 - AI at Meta
-- Everlast AI
-- Christoph Magnussen
-- Niklas Steenfatt
 
 ## Build-Status
 

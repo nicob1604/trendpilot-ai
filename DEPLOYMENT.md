@@ -41,8 +41,8 @@ Die Online-API `/api/trends` liefert erfolgreich:
 Aktueller Live-Status:
 
 - `source`: `google_sheets`
-- `count`: 7 Trends
-- Nach dem YouTube-RSS-Test zeigt das Dashboard aktuell 12 Signale.
+- `count`: 37 Trends
+- Dashboard zeigt aktuell 37 Signale.
 - Google Sheets ist live angebunden.
 - Vercel Environment Variables sind gesetzt.
 - Mock-Daten bleiben als Fallback im Code erhalten.
@@ -97,14 +97,14 @@ Nicht aktivieren:
 
 Das Dashboard lädt aktuell echte Google-Sheet-Daten über die interne API `/api/trends`.
 Die Datenquelle im Dashboard ist `google_sheets`.
-Aktuell werden 7 Trends geladen.
-Nach dem YouTube-RSS-Test zeigt das Dashboard aktuell 12 Signale.
+Aktuell werden 37 Trends geladen.
+Dashboard zeigt aktuell 37 Signale.
 Dashboard-Statistiken werden dynamisch aus den echten Trends berechnet.
 Das Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
 
 Der n8n RSS-Testworkflow funktioniert manuell. RSS-Filterlogik, Scoring und Duplikat-Schutz über `id` funktionieren. Die aktuelle sichere Exportdatei heißt `n8n-trendpilot-rss-current.json` und wurde auf `private_key` geprüft. Es wurde kein `private_key` gefunden.
 
-Der separate YouTube-RSS-Testworkflow `TrendPilot AI – YouTube RSS Test Branch` funktioniert manuell und ist jetzt als Multi-Source-Teststand vorhanden. YouTube wurde nicht über die YouTube Data API angebunden, sondern kostenlos per Channel-RSS. Integriert sind `YouTube – OpenAI`, `YouTube – Google DeepMind` und `YouTube – NVIDIA Developer`. YouTube-Quellen werden konfiguriert, RSS Feeds per HTTP gelesen, Feed-XML über XML to JSON umgewandelt, YouTube-Daten in Trend-Kandidaten umgewandelt, Trend-Daten normalisiert, bestehende Trends gelesen, nur neue Trends gefiltert und neue Trends in Google Sheets geschrieben. Pro Quelle werden maximal 5 neue Videos verarbeitet. Source-Mapping funktioniert für OpenAI, Google DeepMind und NVIDIA Developer. Google Sheet zeigt YouTube-Trends korrekt an. `/api/trends` liest die neuen YouTube-Trends aus Google Sheets. `signalType` ist `YouTube`.
+Der separate YouTube-RSS-Testworkflow `TrendPilot AI – YouTube RSS Test Branch` funktioniert manuell und ist jetzt als Multi-Source-Teststand mit 6 Quellen vorhanden. YouTube wurde nicht über die YouTube Data API angebunden, sondern kostenlos per Channel-RSS. Integriert sind `YouTube – OpenAI`, `YouTube – Google DeepMind`, `YouTube – NVIDIA Developer`, `YouTube – Everlast AI`, `YouTube – Christoph Magnussen` und `YouTube – Niklas Steenfatt`. Technischer Ablauf: Manual Trigger -> YouTube-Quellen konfigurieren -> RSS Feed per HTTP lesen -> XML zu JSON -> YouTube-Daten in Trend-Kandidaten umwandeln -> Trend-Daten normalisieren -> Bestehende Trends lesen -> Nur neue Trends filtern -> Neue Trends in Google Sheets schreiben. Pro Quelle werden maximal 5 Videos verarbeitet; 6 Quellen ergeben maximal 30 YouTube-Kandidaten pro manuellem Lauf. Source-Mapping funktioniert für OpenAI, Google DeepMind, NVIDIA Developer, Everlast AI, Christoph Magnussen und Niklas Steenfatt. Die alten `YouTube – Unknown` Einträge wurden bereinigt. Google Sheet zeigt YouTube-Trends korrekt an. `/api/trends` liest die neuen YouTube-Trends aus Google Sheets. `signalType` ist `YouTube`.
 
 Gesicherte YouTube-Exportdatei: `n8n-trendpilot-youtube-current.json`. Die Datei wurde auf `private_key` geprüft. Es wurde kein `private_key` gefunden. Die Datei wurde committed und gepusht.
 
@@ -117,9 +117,6 @@ Mögliche spätere YouTube-Quellen:
 - Microsoft Developer
 - Hugging Face
 - AI at Meta
-- Everlast AI
-- Christoph Magnussen
-- Niklas Steenfatt
 
 ## Deployment-Ablauf
 
