@@ -10,6 +10,12 @@ export type Trend = {
   source: string;
   timeframe: string;
   signalType: string;
+  sourceUrl?: string;
+  publishedAt?: string;
+  articleTitle?: string;
+  articleSummary?: string;
+  articleBody?: string;
+  sourceName?: string;
 };
 
 export const trends: Trend[] = [

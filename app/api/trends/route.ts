@@ -39,6 +39,12 @@ const trendFields = [
   "source",
   "timeframe",
   "signalType",
+  "sourceUrl",
+  "publishedAt",
+  "articleTitle",
+  "articleSummary",
+  "articleBody",
+  "sourceName",
 ] as const;
 
 const namedHtmlEntities: Record<string, string> = {
@@ -115,6 +121,12 @@ function sanitizeTrend(trend: Trend): Trend {
     source: cleanText(trend.source),
     timeframe: cleanText(trend.timeframe),
     signalType: cleanText(trend.signalType),
+    sourceUrl: trend.sourceUrl ? cleanText(trend.sourceUrl) : undefined,
+    publishedAt: trend.publishedAt ? cleanText(trend.publishedAt) : undefined,
+    articleTitle: trend.articleTitle ? cleanText(trend.articleTitle) : undefined,
+    articleSummary: trend.articleSummary ? cleanText(trend.articleSummary) : undefined,
+    articleBody: trend.articleBody ? cleanText(trend.articleBody) : undefined,
+    sourceName: trend.sourceName ? cleanText(trend.sourceName) : undefined,
   };
 
   return improveGenericRssCopy(sanitizedTrend);
@@ -253,6 +265,12 @@ function normalizeTrendRow(row: string[], headerIndex: Map<string, number>): Tre
     source: getValue("source") || "Google Sheets",
     timeframe: getValue("timeframe") || "Aktuell",
     signalType: getValue("signalType") || "Signal",
+    sourceUrl: getValue("sourceUrl") || undefined,
+    publishedAt: getValue("publishedAt") || undefined,
+    articleTitle: getValue("articleTitle") || undefined,
+    articleSummary: getValue("articleSummary") || undefined,
+    articleBody: getValue("articleBody") || undefined,
+    sourceName: getValue("sourceName") || undefined,
   };
 
   if (!trend.id || !trend.name) {
@@ -286,7 +304,7 @@ async function getGoogleSheetTrends() {
     return null;
   }
 
-  const range = encodeURIComponent(`${tokenData.sheetTab}!A:K`);
+  const range = encodeURIComponent(`${tokenData.sheetTab}!A:Q`);
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${tokenData.sheetId}/values/${range}`;
   const response = await fetch(url, {
     headers: {

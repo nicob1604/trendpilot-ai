@@ -471,60 +471,73 @@ export default function DashboardPage() {
         ) : filteredTrends.length > 0 ? (
           <section className="grid gap-4 lg:grid-cols-2">
             {filteredTrends.map((trend) => (
-              <button
+              <article
                 key={trend.id}
-                type="button"
-                onClick={() => setSelectedTrend(trend)}
                 className="group rounded-2xl border border-white/8 bg-[#121826] p-5 text-left shadow-[0_18px_55px_rgba(0,0,0,0.24)] transition hover:-translate-y-1 hover:border-[#A4C400]/35 hover:bg-[#151D2B] focus:outline-none focus:ring-2 focus:ring-[#A4C400]/50 sm:p-6"
               >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-[#AEB7C2]">
-                        {trend.category}
-                      </span>
-                      <span className="rounded-full border border-[#A4C400]/25 bg-[#A4C400]/10 px-3 py-1 text-xs font-semibold text-[#A4C400]">
-                        {trend.status}
-                      </span>
-                    </div>
-                    <h2 className="mt-5 text-xl font-semibold text-white sm:text-2xl">
-                      {trend.name}
-                    </h2>
-                    <div className="mt-4 flex flex-wrap gap-2 text-xs text-[#AEB7C2]">
-                      {[
-                        ["Quelle", trend.source],
-                        ["Zeitraum", trend.timeframe],
-                        ["Signaltyp", trend.signalType],
-                      ].map(([label, value]) => (
-                        <span
-                          key={label}
-                          className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/8 bg-white/[0.035] px-3 py-1.5 leading-none"
-                        >
-                          <span className="shrink-0 text-white/50">{label}</span>
-                          <span className="min-w-0 truncate text-[#AEB7C2]">{value}</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedTrend(trend)}
+                  className="block w-full rounded-xl text-left focus:outline-none focus:ring-2 focus:ring-[#A4C400]/45"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-[#AEB7C2]">
+                          {trend.category}
                         </span>
-                      ))}
+                        <span className="rounded-full border border-[#A4C400]/25 bg-[#A4C400]/10 px-3 py-1 text-xs font-semibold text-[#A4C400]">
+                          {trend.status}
+                        </span>
+                      </div>
+                      <h2 className="mt-5 text-xl font-semibold text-white sm:text-2xl">
+                        {trend.name}
+                      </h2>
+                      <div className="mt-4 flex flex-wrap gap-2 text-xs text-[#AEB7C2]">
+                        {[
+                          ["Quelle", trend.source],
+                          ["Zeitraum", trend.timeframe],
+                          ["Signaltyp", trend.signalType],
+                        ].map(([label, value]) => (
+                          <span
+                            key={label}
+                            className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/8 bg-white/[0.035] px-3 py-1.5 leading-none"
+                          >
+                            <span className="shrink-0 text-white/50">{label}</span>
+                            <span className="min-w-0 truncate text-[#AEB7C2]">{value}</span>
+                          </span>
+                        ))}
+                      </div>
                     </div>
+                    <ScoreBadge score={trend.score} />
                   </div>
-                  <ScoreBadge score={trend.score} />
-                </div>
 
-                <div className="mt-5 h-2 rounded-full bg-white/8">
-                  <div
-                    className="h-full rounded-full bg-[linear-gradient(90deg,#A4C400,#d8ef49)]"
-                    style={{ width: `${trend.score}%` }}
-                  />
-                </div>
+                  <div className="mt-5 h-2 rounded-full bg-white/8">
+                    <div
+                      className="h-full rounded-full bg-[linear-gradient(90deg,#A4C400,#d8ef49)]"
+                      style={{ width: `${trend.score}%` }}
+                    />
+                  </div>
 
-                <div className="mt-6 rounded-2xl border border-white/8 bg-[#0B0F14]/65 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#A4C400]">
-                    Business Impact
-                  </p>
-                  <p className="mt-3 leading-7 text-[#AEB7C2]">
-                    {trend.businessImpact}
-                  </p>
+                  <div className="mt-6 rounded-2xl border border-white/8 bg-[#0B0F14]/65 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#A4C400]">
+                      Business Impact
+                    </p>
+                    <p className="mt-3 leading-7 text-[#AEB7C2]">
+                      {trend.businessImpact}
+                    </p>
+                  </div>
+                </button>
+
+                <div className="mt-5 flex justify-end">
+                  <a
+                    href={`/trends/${encodeURIComponent(trend.id)}`}
+                    className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#A4C400]/30 bg-[#A4C400]/10 px-4 text-sm font-semibold text-[#A4C400] transition hover:border-[#A4C400]/55 hover:bg-[#A4C400]/15 focus:outline-none focus:ring-2 focus:ring-[#A4C400]/25"
+                  >
+                    Artikel lesen
+                  </a>
                 </div>
-              </button>
+              </article>
             ))}
           </section>
         ) : (
