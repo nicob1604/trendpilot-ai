@@ -6,9 +6,11 @@ import type { Trend } from "./data";
 
 const filters = ["Alle", "Hohe Relevanz", "Neu", "Beobachten"];
 
+const defaultStatusFilter = "Alle";
 const allSourcesFilter = "all-sources";
 const rssSourceFilter = "signal:RSS";
 const youtubeSourceFilter = "signal:YouTube";
+const defaultSortOrder = "score-desc";
 
 const sortOptions = [
   { label: "Score absteigend", value: "score-desc" },
@@ -53,9 +55,9 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("Alle");
+  const [activeFilter, setActiveFilter] = useState(defaultStatusFilter);
   const [activeSourceFilter, setActiveSourceFilter] = useState(allSourcesFilter);
-  const [sortOrder, setSortOrder] = useState("score-desc");
+  const [sortOrder, setSortOrder] = useState(defaultSortOrder);
   const [selectedTrend, setSelectedTrend] = useState<Trend | null>(null);
 
   const stats = useMemo(() => {
@@ -105,6 +107,63 @@ export default function DashboardPage() {
       })),
     ];
   }, [trends]);
+
+  const activeFilterChips = useMemo(() => {
+    const trimmedSearchQuery = searchQuery.trim();
+    const sourceFilterLabel =
+      sourceFilters.find((filter) => filter.value === activeSourceFilter)?.label ||
+      "Ausgewählte Quelle";
+    const sortLabel =
+      sortOptions.find((option) => option.value === sortOrder)?.label || sortOrder;
+
+    return [
+      ...(trimmedSearchQuery
+        ? [
+            {
+              key: "search",
+              label: `Suche: ${trimmedSearchQuery}`,
+              onRemove: () => setSearchQuery(""),
+            },
+          ]
+        : []),
+      ...(activeFilter !== defaultStatusFilter
+        ? [
+            {
+              key: "status",
+              label: `Status: ${activeFilter}`,
+              onRemove: () => setActiveFilter(defaultStatusFilter),
+            },
+          ]
+        : []),
+      ...(activeSourceFilter !== allSourcesFilter
+        ? [
+            {
+              key: "source",
+              label: `Quelle: ${sourceFilterLabel}`,
+              onRemove: () => setActiveSourceFilter(allSourcesFilter),
+            },
+          ]
+        : []),
+      ...(sortOrder !== defaultSortOrder
+        ? [
+            {
+              key: "sort",
+              label: `Sortierung: ${sortLabel}`,
+              onRemove: () => setSortOrder(defaultSortOrder),
+            },
+          ]
+        : []),
+    ];
+  }, [activeFilter, activeSourceFilter, searchQuery, sortOrder, sourceFilters]);
+
+  const hasActiveFilters = activeFilterChips.length > 0;
+
+  const resetFilters = useCallback(() => {
+    setSearchQuery("");
+    setActiveFilter(defaultStatusFilter);
+    setActiveSourceFilter(allSourcesFilter);
+    setSortOrder(defaultSortOrder);
+  }, []);
 
   const loadTrends = useCallback(async () => {
     try {
@@ -332,6 +391,41 @@ export default function DashboardPage() {
             ))}
           </div>
         </section>
+
+        {hasActiveFilters ? (
+          <section className="mb-6 flex flex-col gap-3 rounded-2xl border border-[#A4C400]/20 bg-[#A4C400]/[0.035] p-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#A4C400]">
+                Aktive Filter
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {activeFilterChips.map((chip) => (
+                  <span
+                    key={chip.key}
+                    className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-[#0B0F14]/75 px-3 py-1.5 text-sm text-[#AEB7C2]"
+                  >
+                    <span className="min-w-0 truncate">{chip.label}</span>
+                    <button
+                      type="button"
+                      onClick={chip.onRemove}
+                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/10 text-xs font-bold text-[#A4C400] transition hover:border-[#A4C400]/45 hover:bg-[#A4C400]/10"
+                      aria-label={`${chip.label} entfernen`}
+                    >
+                      x
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="inline-flex min-h-10 w-full shrink-0 items-center justify-center rounded-full border border-[#A4C400]/30 bg-[#A4C400]/10 px-4 text-sm font-semibold text-[#A4C400] transition hover:border-[#A4C400]/55 hover:bg-[#A4C400]/15 focus:outline-none focus:ring-2 focus:ring-[#A4C400]/25 sm:w-auto"
+            >
+              Filter zurücksetzen
+            </button>
+          </section>
+        ) : null}
 
         {!isLoading && !loadError ? (
           <section className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
