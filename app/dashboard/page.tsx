@@ -6,6 +6,10 @@ import type { Trend } from "./data";
 
 const filters = ["Alle", "Hohe Relevanz", "Neu", "Beobachten"];
 
+const allSourcesFilter = "all-sources";
+const rssSourceFilter = "signal:RSS";
+const youtubeSourceFilter = "signal:YouTube";
+
 const sortOptions = [
   { label: "Score absteigend", value: "score-desc" },
   { label: "Score aufsteigend", value: "score-asc" },
@@ -50,6 +54,7 @@ export default function DashboardPage() {
   const [loadError, setLoadError] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("Alle");
+  const [activeSourceFilter, setActiveSourceFilter] = useState(allSourcesFilter);
   const [sortOrder, setSortOrder] = useState("score-desc");
   const [selectedTrend, setSelectedTrend] = useState<Trend | null>(null);
 
@@ -77,6 +82,27 @@ export default function DashboardPage() {
         value: String(watchCount),
         detail: "weiter im Radar",
       },
+    ];
+  }, [trends]);
+
+  const sourceFilters = useMemo(() => {
+    const signalTypes = new Set(
+      trends.map((trend) => trend.signalType.trim()).filter(Boolean),
+    );
+    const sources = Array.from(
+      new Set(trends.map((trend) => trend.source.trim()).filter(Boolean)),
+    ).sort((a, b) => a.localeCompare(b));
+
+    return [
+      { label: "Alle Quellen", value: allSourcesFilter },
+      ...(signalTypes.has("RSS") ? [{ label: "RSS", value: rssSourceFilter }] : []),
+      ...(signalTypes.has("YouTube")
+        ? [{ label: "YouTube", value: youtubeSourceFilter }]
+        : []),
+      ...sources.map((source) => ({
+        label: source,
+        value: `source:${source}`,
+      })),
     ];
   }, [trends]);
 
@@ -142,7 +168,14 @@ export default function DashboardPage() {
     const visibleTrends = trends.filter((trend) => {
       const matchesSearch =
         normalizedQuery.length === 0 ||
-        [trend.name, trend.category, trend.status, trend.businessImpact]
+        [
+          trend.name,
+          trend.category,
+          trend.status,
+          trend.businessImpact,
+          trend.source,
+          trend.signalType,
+        ]
           .join(" ")
           .toLowerCase()
           .includes(normalizedQuery);
@@ -153,7 +186,14 @@ export default function DashboardPage() {
         (activeFilter === "Neu" && trend.status === "Neu") ||
         (activeFilter === "Beobachten" && trend.status === "Beobachten");
 
-      return matchesSearch && matchesFilter;
+      const matchesSourceFilter =
+        activeSourceFilter === allSourcesFilter ||
+        (activeSourceFilter === rssSourceFilter && trend.signalType === "RSS") ||
+        (activeSourceFilter === youtubeSourceFilter &&
+          trend.signalType === "YouTube") ||
+        activeSourceFilter === `source:${trend.source}`;
+
+      return matchesSearch && matchesFilter && matchesSourceFilter;
     });
 
     return [...visibleTrends].sort((a, b) => {
@@ -167,7 +207,7 @@ export default function DashboardPage() {
 
       return b.score - a.score;
     });
-  }, [activeFilter, searchQuery, sortOrder, trends]);
+  }, [activeFilter, activeSourceFilter, searchQuery, sortOrder, trends]);
 
   return (
     <main className="min-h-screen bg-[#0B0F14] bg-[radial-gradient(circle_at_50%_0%,rgba(164,196,0,0.12),transparent_34%),linear-gradient(180deg,#0B0F14_0%,#101722_58%,#0B0F14_100%)] px-4 py-6 text-white sm:px-8 sm:py-8 lg:px-10">
@@ -269,6 +309,28 @@ export default function DashboardPage() {
               {filter}
             </button>
           ))}
+        </section>
+
+        <section className="mb-6 rounded-2xl border border-white/8 bg-[#121826]/60 p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#AEB7C2]/70">
+            Quellen
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {sourceFilters.map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => setActiveSourceFilter(filter.value)}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                  activeSourceFilter === filter.value
+                    ? "border-[#A4C400]/35 bg-[#A4C400] text-[#0B0F14]"
+                    : "border-white/10 bg-white/[0.035] text-[#AEB7C2] hover:border-[#A4C400]/45 hover:text-white"
+                }`}
+                type="button"
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
         </section>
 
         {!isLoading && !loadError ? (
