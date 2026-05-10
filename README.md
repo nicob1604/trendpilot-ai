@@ -71,9 +71,9 @@ Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünsc
 
 ## n8n YouTube-RSS-Testworkflow
 
-Der separate n8n-Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde erfolgreich manuell getestet.
+Der separate n8n-Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde zum YouTube-Multi-Source-Teststand erweitert und erfolgreich manuell getestet.
 
-- YouTube-RSS ist als neue Quellenart erfolgreich getestet.
+- YouTube-RSS ist als Multi-Source-Quellenart erfolgreich getestet.
 - YouTube wurde nicht über die YouTube Data API angebunden.
 - Stattdessen wird YouTube per Channel-RSS genutzt.
 - Es werden keine neuen API-Keys benötigt.
@@ -81,17 +81,25 @@ Der separate n8n-Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde erfo
 - Keine kostenpflichtigen Dienste wurden aktiviert.
 - Kein Schedule Trigger ist aktiv.
 - Der Workflow läuft weiterhin nur manuell.
-- OpenAI wurde als erste offizielle YouTube-Quelle getestet.
-- Feed wird per HTTP gelesen.
+- Integrierte Quellen:
+  - YouTube – OpenAI
+  - YouTube – Google DeepMind
+  - YouTube – NVIDIA Developer
+- YouTube-Quellen werden im Workflow konfiguriert.
+- RSS Feeds werden per HTTP gelesen.
 - Feed-XML wird über XML to JSON umgewandelt.
 - YouTube-Daten werden in Trend-Kandidaten umgewandelt und normalisiert.
-- Die Ausgabe ist bewusst auf die 5 neuesten Videos begrenzt.
+- Pro Quelle werden maximal 5 neue Videos verarbeitet.
+- Source-Mapping funktioniert:
+  - OpenAI -> YouTube – OpenAI
+  - Google DeepMind -> YouTube – Google DeepMind
+  - NVIDIA Developer -> YouTube – NVIDIA Developer
 - Duplikate werden über `id` geprüft.
-- 5 neue YouTube-Trends wurden erfolgreich ins Google Sheet geschrieben.
+- Google Sheet zeigt YouTube-Trends korrekt an.
 - `/api/trends` liest die neuen YouTube-Trends aus Google Sheets.
 - Dashboard zeigt jetzt 12 Signale.
 - `signalType`: `YouTube`
-- `source`: `YouTube – OpenAI`
+- `source`: `YouTube – OpenAI`, `YouTube – Google DeepMind` oder `YouTube – NVIDIA Developer`
 - Gesicherte Exportdatei: `n8n-trendpilot-youtube-current.json`
 - Die Exportdatei wurde auf `private_key` geprüft.
 - Es wurde kein `private_key` gefunden.
@@ -99,14 +107,12 @@ Der separate n8n-Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde erfo
 
 Weitere mögliche YouTube-Quellen für später:
 
-- Google DeepMind
 - Microsoft Developer
-- NVIDIA Developer
 - Hugging Face
 - AI at Meta
-- Niklas Steenfatt
-- Christoph Magnussen
 - Everlast AI
+- Christoph Magnussen
+- Niklas Steenfatt
 
 ## Kostenstatus
 

@@ -104,7 +104,7 @@ Das Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
 
 Der n8n RSS-Testworkflow funktioniert manuell. RSS-Filterlogik, Scoring und Duplikat-Schutz über `id` funktionieren. Die aktuelle sichere Exportdatei heißt `n8n-trendpilot-rss-current.json` und wurde auf `private_key` geprüft. Es wurde kein `private_key` gefunden.
 
-Der separate YouTube-RSS-Testworkflow `TrendPilot AI – YouTube RSS Test Branch` funktioniert manuell. YouTube wurde nicht über die YouTube Data API angebunden, sondern kostenlos per Channel-RSS. OpenAI wurde als erste offizielle YouTube-Quelle getestet. Die Ausgabe ist bewusst auf die 5 neuesten Videos begrenzt. 5 neue YouTube-Trends wurden erfolgreich ins Google Sheet geschrieben. `/api/trends` liest die neuen YouTube-Trends aus Google Sheets. `signalType` ist `YouTube`, `source` ist `YouTube – OpenAI`.
+Der separate YouTube-RSS-Testworkflow `TrendPilot AI – YouTube RSS Test Branch` funktioniert manuell und ist jetzt als Multi-Source-Teststand vorhanden. YouTube wurde nicht über die YouTube Data API angebunden, sondern kostenlos per Channel-RSS. Integriert sind `YouTube – OpenAI`, `YouTube – Google DeepMind` und `YouTube – NVIDIA Developer`. YouTube-Quellen werden konfiguriert, RSS Feeds per HTTP gelesen, Feed-XML über XML to JSON umgewandelt, YouTube-Daten in Trend-Kandidaten umgewandelt, Trend-Daten normalisiert, bestehende Trends gelesen, nur neue Trends gefiltert und neue Trends in Google Sheets geschrieben. Pro Quelle werden maximal 5 neue Videos verarbeitet. Source-Mapping funktioniert für OpenAI, Google DeepMind und NVIDIA Developer. Google Sheet zeigt YouTube-Trends korrekt an. `/api/trends` liest die neuen YouTube-Trends aus Google Sheets. `signalType` ist `YouTube`.
 
 Gesicherte YouTube-Exportdatei: `n8n-trendpilot-youtube-current.json`. Die Datei wurde auf `private_key` geprüft. Es wurde kein `private_key` gefunden. Die Datei wurde committed und gepusht.
 
@@ -114,14 +114,12 @@ Später können weitere RSS- oder YouTube-Quellen ergänzt werden. Ein Schedule 
 
 Mögliche spätere YouTube-Quellen:
 
-- Google DeepMind
 - Microsoft Developer
-- NVIDIA Developer
 - Hugging Face
 - AI at Meta
-- Niklas Steenfatt
-- Christoph Magnussen
 - Everlast AI
+- Christoph Magnussen
+- Niklas Steenfatt
 
 ## Deployment-Ablauf
 
