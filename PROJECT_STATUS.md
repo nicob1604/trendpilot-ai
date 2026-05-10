@@ -149,6 +149,17 @@ https://docs.google.com/spreadsheets/d/1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6
 
 Die App nutzt aktuell echte Google-Sheet-Daten über `/api/trends`. Vercel Environment Variables sind gesetzt. Es dürfen keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien ins Repository geschrieben werden.
 
+Das Google Sheet unterstützt jetzt optionale Artikel- und Quellenfelder für die Trend-Detailseiten:
+
+- Spalte L: `sourceUrl`
+- Spalte M: `publishedAt`
+- Spalte N: `articleTitle`
+- Spalte O: `articleSummary`
+- Spalte P: `articleBody`
+- Spalte Q: `sourceName`
+
+Wenn `sourceUrl` vorhanden ist, erscheint auf der Detailseite unter `/trends/[id]` automatisch der Link `Originalquelle öffnen`. Fehlt `sourceUrl`, bleibt die Detailseite funktionsfähig und zeigt den Quellennamen.
+
 ## n8n-Workflow-Status
 
 Der Workflow `TrendPilot AI – Google Sheets Blueprint` wurde in n8n importiert, mit dem Google Sheet verbunden und manuell getestet.
@@ -203,6 +214,8 @@ Sicherheits- und Betriebsstatus:
 - Die Datei wurde auf `private_key` geprüft und enthält keinen Google-Service-Account-Private-Key.
 - Keine Secrets, Private Keys oder Google-Service-Account-JSON-Dateien committen.
 - RSS-Filterlogik und Scoring wurden verbessert.
+- Neue RSS-Trends schreiben optional Quellenlinks und Artikeldaten in die Spalten L bis Q.
+- `sourceUrl` wird bevorzugt aus dem echten RSS-Link gelesen; ersatzweise aus URL-/GUID-Feldern, wenn diese eine URL enthalten.
 - Das Dashboard nutzt echte Google-Sheet-Daten über `/api/trends`.
 
 Nächster großer Schritt:
@@ -252,6 +265,9 @@ Testdetails:
 - Dashboard zeigt jetzt 37 Signale.
 - `signalType`: `YouTube`
 - `source`: korrekt gemappte YouTube-Quelle
+- Neue YouTube-Trends schreiben optional Quellenlinks und Artikeldaten in die Spalten L bis Q.
+- `sourceUrl` wird bevorzugt aus dem Feed-Link gelesen; wenn nur eine Video-ID vorhanden ist, wird daraus `https://www.youtube.com/watch?v=VIDEO_ID` erzeugt.
+- `sourceName` ist der konkrete Kanalname, zum Beispiel `YouTube – OpenAI`.
 
 Sicherheits- und Betriebsstatus:
 

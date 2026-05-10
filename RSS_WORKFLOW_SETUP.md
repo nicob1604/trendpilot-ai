@@ -101,6 +101,17 @@ Der Code Node `RSS-Daten in Trend-Kandidaten umwandeln` bildet RSS-Daten auf die
 
 Diese Werte sind Startwerte. Sie sollen später durch eine bessere Bewertungslogik ergänzt oder manuell überprüft werden.
 
+Zusätzlich werden optionale Artikel- und Quellenfelder für die Trend-Detailseiten vorbereitet:
+
+- `sourceUrl`: bevorzugt aus dem echten RSS-Link; ersatzweise aus URL-/GUID-Feldern, wenn diese eine URL enthalten
+- `publishedAt`: aus `pubDate`, `isoDate`, `published` oder `updated`, falls vorhanden
+- `articleTitle`: bevorzugt der bereinigte RSS-Titel
+- `articleSummary`: bevorzugt `contentSnippet`, `summary`, `description` oder eine vorhandene Kurzbeschreibung
+- `articleBody`: vorsichtig aus vorhandenen RSS-Feldern aufgebaut, ohne externe Anreicherung, Scraping oder KI-API
+- `sourceName`: lesbarer Quellenname, aktuell zum Beispiel `The Verge RSS`
+
+Im Google Sheet werden diese optionalen Felder in den Spalten L bis Q geschrieben: `sourceUrl`, `publishedAt`, `articleTitle`, `articleSummary`, `articleBody`, `sourceName`. Wenn `sourceUrl` vorhanden ist, erscheint auf der Detailseite automatisch der Link `Originalquelle öffnen`.
+
 ## 6. Duplikate über `id` verhindern
 
 Der Workflow liest vor dem Schreiben bestehende Trends aus dem Google Sheet.
@@ -131,6 +142,8 @@ Der manuelle Test hat bestätigt:
 - Der sichere Workflow-Export heißt `n8n-trendpilot-rss-current.json`.
 - Die Datei wurde auf `private_key` geprüft und enthält keinen Google-Service-Account-Private-Key.
 - Das Dashboard nutzt echte Google-Sheet-Daten über `/api/trends`.
+- Der Export schreibt optional Quellenlinks und Artikeldaten in die Spalten L bis Q.
+- Es werden keine kostenpflichtigen APIs, kein externes Scraping und keine KI-API genutzt.
 
 ## 7. Hinweise
 
@@ -192,6 +205,9 @@ Testdetails:
 - Dashboard zeigt jetzt 37 Signale.
 - `signalType`: `YouTube`
 - `source`: korrekt gemappte YouTube-Quelle
+- Neue YouTube-Trends schreiben optional `sourceUrl`, `publishedAt`, `articleTitle`, `articleSummary`, `articleBody` und `sourceName`.
+- `sourceUrl` wird bevorzugt aus dem Feed-Link gelesen; wenn nur eine Video-ID vorhanden ist, wird daraus `https://www.youtube.com/watch?v=VIDEO_ID` erzeugt.
+- `sourceName` ist der konkrete Kanalname, zum Beispiel `YouTube – OpenAI`.
 
 Sicherheits- und Betriebsstatus:
 
@@ -236,3 +252,9 @@ https://docs.google.com/spreadsheets/d/1Gt8Lv1VY5CXRdqBYTDw8KPRSU-yMnXRI4IoB7bh6
 - `source`
 - `timeframe`
 - `signalType`
+- `sourceUrl` (optional, Spalte L)
+- `publishedAt` (optional, Spalte M)
+- `articleTitle` (optional, Spalte N)
+- `articleSummary` (optional, Spalte O)
+- `articleBody` (optional, Spalte P)
+- `sourceName` (optional, Spalte Q)

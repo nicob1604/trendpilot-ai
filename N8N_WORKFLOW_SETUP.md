@@ -29,6 +29,13 @@ Aktuell ist das nur eine Vorlage. Es ist noch keine echte Automation aktiv und e
      - `source`
      - `timeframe`
      - `signalType`
+   - Optional werden zusätzlich Artikel- und Quellenfelder vorbereitet:
+     - `sourceUrl`
+     - `publishedAt`
+     - `articleTitle`
+     - `articleSummary`
+     - `articleBody`
+     - `sourceName`
 
 4. In Google Sheets schreiben
    - Schreibt die normalisierten Trend-Daten als neue Zeilen in das geplante Google Sheet.
@@ -71,6 +78,21 @@ Nach dem Import in n8n:
    `trends`
 5. Sicherstellen, dass die Spalten exakt den dokumentierten Feldnamen entsprechen.
 6. Workflow manuell testen.
+
+## Optionale Artikel- und Quellenfelder
+
+Das Google Sheet unterstützt zusätzlich zu den Pflichtfeldern jetzt optionale Artikel- und Quellenfelder in den Spalten L bis Q:
+
+| Spalte | Feld | Bedeutung |
+| --- | --- | --- |
+| L | `sourceUrl` | Direkter Link zur Originalquelle, zum Beispiel RSS-Artikel oder YouTube-Video. |
+| M | `publishedAt` | Veröffentlichungszeitpunkt aus RSS- oder YouTube-RSS-Daten, falls vorhanden. |
+| N | `articleTitle` | Titel für die Detailseite, bevorzugt aus RSS- oder YouTube-Titel. |
+| O | `articleSummary` | Kurze Einordnung aus vorhandenen Feed-Beschreibungen. |
+| P | `articleBody` | Längere Artikelansicht aus vorhandenen Feed-Feldern, ohne externe Anreicherung. |
+| Q | `sourceName` | Lesbarer Quellenname, zum Beispiel `The Verge RSS` oder `YouTube – OpenAI`. |
+
+Wenn `sourceUrl` vorhanden ist, zeigt die Trend-Detailseite automatisch den Button `Originalquelle öffnen`. Der Link wird in einem neuen Tab geöffnet. Wenn `sourceUrl` fehlt, bleibt die Detailseite funktionsfähig und zeigt nur den Quellennamen.
 
 ## Kostenstatus
 

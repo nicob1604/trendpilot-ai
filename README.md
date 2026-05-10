@@ -56,6 +56,19 @@ Tabellenblatt:
 trends
 ```
 
+Das Sheet unterstützt jetzt optionale Artikel- und Quellenfelder für Trend-Detailseiten:
+
+| Spalte | Feld |
+| --- | --- |
+| L | `sourceUrl` |
+| M | `publishedAt` |
+| N | `articleTitle` |
+| O | `articleSummary` |
+| P | `articleBody` |
+| Q | `sourceName` |
+
+Wenn `sourceUrl` vorhanden ist, zeigt `/trends/[id]` automatisch den Link `Originalquelle öffnen`. Die n8n-Workflows befüllen diese Felder ausschließlich aus vorhandenen RSS- oder YouTube-RSS-Daten, ohne Scraping, YouTube Data API, API-Keys oder kostenpflichtige Dienste.
+
 ## Dashboard-Quellenfilter
 
 Der Dashboard-Quellenfilter ist live und wird automatisch aus den geladenen Trends erzeugt.
@@ -102,6 +115,8 @@ Der n8n RSS-Testworkflow `TrendPilot AI – RSS Test Branch` funktioniert manuel
 - Es wurde kein `private_key` gefunden.
 - Der Workflow läuft aktuell nur manuell.
 - Es ist kein Schedule Trigger aktiv.
+- Neue RSS-Trends schreiben optional `sourceUrl`, `publishedAt`, `articleTitle`, `articleSummary`, `articleBody` und `sourceName`.
+- `sourceUrl` wird bevorzugt aus dem echten RSS-Link gelesen; ersatzweise aus URL-/GUID-Feldern, wenn diese eine URL enthalten.
 
 Ein Schedule Trigger soll erst aktiviert werden, wenn das ausdrücklich gewünscht ist.
 
@@ -145,6 +160,9 @@ Der separate n8n-Workflow `TrendPilot AI – YouTube RSS Test Branch` wurde zum 
 - Dashboard zeigt jetzt 37 Signale.
 - `signalType`: `YouTube`
 - `source`: korrekt gemappte YouTube-Quelle
+- Neue YouTube-Trends schreiben optional `sourceUrl`, `publishedAt`, `articleTitle`, `articleSummary`, `articleBody` und `sourceName`.
+- `sourceUrl` wird bevorzugt aus dem Feed-Link gelesen; wenn nur eine Video-ID vorhanden ist, wird daraus `https://www.youtube.com/watch?v=VIDEO_ID` erzeugt.
+- `sourceName` ist der konkrete Kanalname, zum Beispiel `YouTube – OpenAI`.
 - Gesicherte Exportdatei: `n8n-trendpilot-youtube-current.json`
 - Die Exportdatei wurde auf `private_key` geprüft.
 - Es wurde kein `private_key` gefunden.
