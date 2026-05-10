@@ -18,6 +18,7 @@ TrendPilot AI ist ein Next.js MVP für eine moderne AI-Trend-Radar-Landingpage m
 - Aktuell werden 37 Trends aus Google Sheets geladen.
 - Dashboard zeigt aktuell 37 Signale.
 - Dashboard-Statistiken werden dynamisch aus den echten Trends berechnet.
+- Dashboard-Quellenfilter ist live und wurde erfolgreich getestet.
 - Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
 - Icon/Favicon und Metadata sind ergänzt.
 - GitHub und Vercel sind aktuell.
@@ -54,6 +55,41 @@ Tabellenblatt:
 ```text
 trends
 ```
+
+## Dashboard-Quellenfilter
+
+Der Dashboard-Quellenfilter ist live und wird automatisch aus den geladenen Trends erzeugt.
+
+- Quellen können nach Signaltyp `RSS` oder `YouTube` gefiltert werden.
+- Konkrete Quellen können einzeln ausgewählt werden.
+- Die Ergebnisanzahl aktualisiert sich korrekt.
+- Der Quellenfilter funktioniert zusammen mit Suche, Statusfilter und Sortierung.
+- Keine API-Änderungen waren nötig.
+- Keine Environment Variables wurden geändert.
+- Keine kostenpflichtigen Dienste wurden aktiviert.
+- Kein Schedule Trigger ist aktiv.
+
+Live getestet:
+
+- Alle Quellen -> 37 Trends
+- YouTube -> 30 Trends
+- YouTube – Niklas Steenfatt -> 5 Trends
+- Datenquelle bleibt `google_sheets`
+
+Der Quellenfilter enthält unter anderem:
+
+- Alle Quellen
+- RSS
+- YouTube
+- Launches & Tool-Updates
+- Regulatorische Signale
+- The Verge RSS
+- YouTube – OpenAI
+- YouTube – Google DeepMind
+- YouTube – NVIDIA Developer
+- YouTube – Everlast AI
+- YouTube – Christoph Magnussen
+- YouTube – Niklas Steenfatt
 
 ## n8n RSS-Testworkflow
 

@@ -33,6 +33,7 @@ https://trendpilot-ai-two.vercel.app
 - Aktuell werden 37 Trends aus Google Sheets geladen
 - Dashboard zeigt aktuell 37 Signale
 - Dashboard-Statistiken werden dynamisch aus echten Trends berechnet
+- Dashboard-Quellenfilter ist live und wurde erfolgreich getestet
 - Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt
 - Icon/Favicon und Metadata wurden ergänzt
 - GitHub und Vercel sind aktuell
@@ -80,6 +81,7 @@ Aktueller Live-Status:
 
 - Suche
 - Filter
+- Quellenfilter
 - Sortierung
 - Ergebnisanzahl
 - Trend Cards
@@ -90,6 +92,42 @@ Aktueller Live-Status:
 - Zuletzt aktualisiert
 - Aktualisieren-Button
 - Responsive Layout
+
+## Dashboard-Quellenfilter
+
+Der Dashboard-Quellenfilter ist live.
+
+- Quellen werden automatisch aus den geladenen Trends erzeugt.
+- Quellen können nach Signaltyp `RSS` oder `YouTube` gefiltert werden.
+- Konkrete Quellen können einzeln ausgewählt werden.
+- Die Ergebnisanzahl aktualisiert sich korrekt.
+- Der Quellenfilter funktioniert zusammen mit Suche, Statusfilter und Sortierung.
+- Keine API-Änderungen waren nötig.
+- Keine Environment Variables wurden geändert.
+- Keine kostenpflichtigen Dienste wurden aktiviert.
+- Kein Schedule Trigger ist aktiv.
+
+Live getestete Ergebnisse:
+
+- Alle Quellen -> 37 Trends
+- YouTube -> 30 Trends
+- YouTube – Niklas Steenfatt -> 5 Trends
+- Datenquelle bleibt `google_sheets`
+
+Aktuelle Quellenfilter-Optionen enthalten unter anderem:
+
+- Alle Quellen
+- RSS
+- YouTube
+- Launches & Tool-Updates
+- Regulatorische Signale
+- The Verge RSS
+- YouTube – OpenAI
+- YouTube – Google DeepMind
+- YouTube – NVIDIA Developer
+- YouTube – Everlast AI
+- YouTube – Christoph Magnussen
+- YouTube – Niklas Steenfatt
 
 ## Datenstatus
 

@@ -14,8 +14,32 @@ Aktueller MVP-Stand:
 - Aktuell werden 37 Trends geladen.
 - Dashboard zeigt aktuell 37 Signale.
 - Dashboard-Statistiken werden dynamisch aus echten Trends berechnet.
+- Dashboard-Quellenfilter ist live und wurde erfolgreich getestet.
 - Vercel Environment Variables sind gesetzt.
 - Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
+
+## 1.1 Dashboard-Quellenfilter
+
+Der Dashboard-Quellenfilter ist live.
+
+- Quellen werden automatisch aus den geladenen Trends erzeugt.
+- Quellen können nach Signaltyp `RSS` oder `YouTube` gefiltert werden.
+- Konkrete Quellen können einzeln ausgewählt werden.
+- Die Ergebnisanzahl aktualisiert sich korrekt.
+- Der Filter funktioniert mit Suche, Statusfilter und Sortierung.
+- Keine API-Änderungen waren nötig.
+- Keine Environment Variables wurden geändert.
+- Keine kostenpflichtigen Dienste wurden aktiviert.
+- Kein Schedule Trigger ist aktiv.
+
+Live getestet:
+
+- Alle Quellen -> 37 Trends
+- YouTube -> 30 Trends
+- YouTube – Niklas Steenfatt -> 5 Trends
+- Datenquelle bleibt `google_sheets`
+
+Aktuelle Filteroptionen enthalten unter anderem `RSS`, `YouTube`, `The Verge RSS` und die integrierten YouTube-Quellen.
 
 ## 2. Geplanter Ablauf
 

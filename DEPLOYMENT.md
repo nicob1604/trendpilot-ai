@@ -100,6 +100,17 @@ Die Datenquelle im Dashboard ist `google_sheets`.
 Aktuell werden 37 Trends geladen.
 Dashboard zeigt aktuell 37 Signale.
 Dashboard-Statistiken werden dynamisch aus den echten Trends berechnet.
+Der Dashboard-Quellenfilter ist live und wurde erfolgreich getestet. Quellen können nach Signaltyp `RSS` oder `YouTube` sowie nach konkreter Quelle gefiltert werden. Die Ergebnisanzahl aktualisiert sich korrekt. Der Filter funktioniert zusammen mit Suche, Statusfilter und Sortierung. Keine API-Änderungen waren nötig, keine Environment Variables wurden geändert, keine kostenpflichtigen Dienste wurden aktiviert und kein Schedule Trigger ist aktiv.
+
+Live getestete Quellenfilter-Ergebnisse:
+
+- Alle Quellen -> 37 Trends
+- YouTube -> 30 Trends
+- YouTube – Niklas Steenfatt -> 5 Trends
+- Datenquelle bleibt `google_sheets`
+
+Der Quellenfilter enthält unter anderem `Alle Quellen`, `RSS`, `YouTube`, `The Verge RSS` und die integrierten YouTube-Quellen.
+
 Das Google Sheet wurde bereinigt und ein Backup-Tab wurde erstellt.
 
 Der n8n RSS-Testworkflow funktioniert manuell. RSS-Filterlogik, Scoring und Duplikat-Schutz über `id` funktionieren. Die aktuelle sichere Exportdatei heißt `n8n-trendpilot-rss-current.json` und wurde auf `private_key` geprüft. Es wurde kein `private_key` gefunden.
