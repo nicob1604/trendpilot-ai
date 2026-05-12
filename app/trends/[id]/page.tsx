@@ -49,12 +49,45 @@ function formatPublishedAt(value: string | undefined) {
   }).format(date);
 }
 
+function removePromoSentences(value: string) {
+  return value
+    .replace(/https?:\/\/[^\s)]+/gi, " ")
+    .replace(/www\.[^\s)]+/gi, " ")
+    .replace(/Sichere dir[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Sicher dir[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Melde dich[^.!?\n]*(?:Workshop|Webinar|Newsletter)[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Jetzt anmelden[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Kostenfrei(?:en|er|es)?[^.!?\n]*(?:Workshop|Webinar|Training|Live)[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Meta Ads CLI kostenlos einrichten[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Agentic Coding Workshop[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Hostinger[^.!?\n]*(?:Rabatt|Code|Deal|Angebot|Sponsor)[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/(?:Rabattcode|Gutscheincode|Code NIKLAS|Code STEENFATT)[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Zum Newsletter[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Newsletter abonnieren[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Abonniere[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Folge mir[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Folgt mir[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Instagram[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Discord[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/LinkedIn[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/Twitter[^.!?\n]*(?:[.!?]|$)/gi, " ")
+    .replace(/X \(Twitter\)[^.!?\n]*(?:[.!?]|$)/gi, " ");
+}
+
 function cleanArticleText(value: string | undefined) {
   if (!value) {
     return "";
   }
 
-  return value
+  const cleanedText = removePromoSentences(value)
+    .replace(/\r\n/g, "\n")
+    .replace(/\t/g, " ")
+    .replace(/[ ]{2,}/g, " ")
+    .replace(/\s+([,.!?;:])/g, "$1")
+    .replace(/:\s*(?:\.|,|;)?\s*$/gm, "")
+    .trim();
+
+  return cleanedText
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => {
@@ -70,10 +103,27 @@ function cleanArticleText(value: string | undefined) {
         return false;
       }
 
+      if (/^(timestamps?|kapitel|links?|socials?)\s*:/i.test(line)) {
+        return false;
+      }
+
+      if (/^(werbung|anzeige|sponsor|sponsored)\s*:/i.test(line)) {
+        return false;
+      }
+
+      if (/^(like|kommentieren|teilen|abonnieren)$/i.test(line)) {
+        return false;
+      }
+
+      if (line.length < 8) {
+        return false;
+      }
+
       return true;
     })
     .join("\n\n")
     .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ ]{2,}/g, " ")
     .trim();
 }
 
@@ -128,7 +178,13 @@ function ArticleSection({
         </p>
       ) : null}
 
-      <h2 className={eyebrow ? "mt-2 text-2xl font-semibold text-white" : "text-2xl font-semibold text-white"}>
+      <h2
+        className={
+          eyebrow
+            ? "mt-2 text-2xl font-semibold text-white"
+            : "text-2xl font-semibold text-white"
+        }
+      >
         {title}
       </h2>
 
@@ -252,7 +308,7 @@ export default function TrendArticlePage() {
   }
 
   const title = getText(trend.articleTitle, trend.name);
-  const intro = getText(trend.articleSummary, trend.summary);
+  const intro = cleanArticleText(getText(trend.articleSummary, trend.summary));
   const sourceName = getText(trend.sourceName, trend.source);
   const sourceUrl = isValidSourceUrl(trend.sourceUrl) ? trend.sourceUrl : undefined;
   const readablePublishedAt = formatPublishedAt(trend.publishedAt);
@@ -262,14 +318,18 @@ export default function TrendArticlePage() {
     cleanArticleText(trend.summary) ||
     intro;
 
-  const businessImpact = getText(
-    trend.businessImpact,
-    "Dieses Signal sollte geprüft werden, weil es auf eine relevante Entwicklung im Bereich KI, Automatisierung oder digitale Produktivität hinweisen kann.",
+  const businessImpact = cleanArticleText(
+    getText(
+      trend.businessImpact,
+      "Dieses Signal sollte geprüft werden, weil es auf eine relevante Entwicklung im Bereich KI, Automatisierung oder digitale Produktivität hinweisen kann.",
+    ),
   );
 
-  const recommendation = getText(
-    trend.recommendation,
-    "Das Signal sollte beobachtet und bei passender Relevanz in bestehende KI-, Automatisierungs- oder Produktivitätsprozesse eingeordnet werden.",
+  const recommendation = cleanArticleText(
+    getText(
+      trend.recommendation,
+      "Das Signal sollte beobachtet und bei passender Relevanz in bestehende KI-, Automatisierungs- oder Produktivitätsprozesse eingeordnet werden.",
+    ),
   );
 
   return (
@@ -303,7 +363,7 @@ export default function TrendArticlePage() {
             </h1>
 
             <p className="mt-5 max-w-3xl text-lg leading-8 text-[#AEB7C2]">
-              {intro}
+              {intro || getText(trend.summary)}
             </p>
 
             <div className="mt-7 flex flex-wrap gap-2">
