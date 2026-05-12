@@ -56,7 +56,7 @@ function normalizeSearchText(value: unknown) {
 }
 
 function getSearchTerms(query: string) {
-  return normalizeSearchText(query).split(" ").filter(Boolean);
+  return normalizeSearchText(query).split(/\s+/).filter(Boolean);
 }
 
 function getTrendSearchText(trend: Trend) {
@@ -72,6 +72,7 @@ function getTrendSearchText(trend: Trend) {
       trend.recommendation,
       trend.articleTitle,
       trend.articleSummary,
+      trend.articleBody,
       trend.sourceName,
     ].join(" "),
   );
@@ -250,13 +251,13 @@ export default function DashboardPage() {
     };
   }, [selectedTrend]);
 
-  const filteredTrends = useMemo(() => {
-    const searchTerms = getSearchTerms(searchQuery);
+  const visibleTrends = useMemo(() => {
+    const searchTokens = getSearchTerms(searchQuery);
 
-    const visibleTrends = trends.filter((trend) => {
+    const filtered = trends.filter((trend) => {
       const matchesSearch =
-        searchTerms.length === 0 ||
-        searchTerms.every((term) => getTrendSearchText(trend).includes(term));
+        searchTokens.length === 0 ||
+        searchTokens.every((token) => getTrendSearchText(trend).includes(token));
 
       const matchesFilter =
         activeFilter === "Alle" ||
@@ -274,16 +275,30 @@ export default function DashboardPage() {
       return matchesSearch && matchesFilter && matchesSourceFilter;
     });
 
-    return [...visibleTrends].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       if (sortOrder === "score-asc") {
-        return a.score - b.score;
+        return Number(a.score || 0) - Number(b.score || 0);
       }
 
       if (sortOrder === "name-asc") {
         return a.name.localeCompare(b.name);
       }
 
-      return b.score - a.score;
+      if (sortOrder === "date-desc") {
+        return (
+          new Date(b.publishedAt || 0).getTime() -
+          new Date(a.publishedAt || 0).getTime()
+        );
+      }
+
+      if (sortOrder === "date-asc") {
+        return (
+          new Date(a.publishedAt || 0).getTime() -
+          new Date(b.publishedAt || 0).getTime()
+        );
+      }
+
+      return Number(b.score || 0) - Number(a.score || 0);
     });
   }, [activeFilter, activeSourceFilter, searchQuery, sortOrder, trends]);
 
@@ -452,7 +467,7 @@ export default function DashboardPage() {
         {!isLoading && !loadError ? (
           <section className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-medium text-[#AEB7C2]">
-              {filteredTrends.length} Trends angezeigt
+              {visibleTrends.length} Trends angezeigt
             </p>
             <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#AEB7C2]/70 sm:flex-row sm:items-center">
               Sortieren
@@ -487,9 +502,9 @@ export default function DashboardPage() {
               Trends konnten nicht geladen werden.
             </p>
           </section>
-        ) : filteredTrends.length > 0 ? (
+        ) : visibleTrends.length > 0 ? (
           <section className="grid gap-4 lg:grid-cols-2">
-            {filteredTrends.map((trend) => (
+            {visibleTrends.map((trend) => (
               <article
                 key={trend.id}
                 className="group rounded-2xl border border-white/8 bg-[#121826] p-5 text-left shadow-[0_18px_55px_rgba(0,0,0,0.24)] transition hover:-translate-y-1 hover:border-[#A4C400]/35 hover:bg-[#151D2B] focus:outline-none focus:ring-2 focus:ring-[#A4C400]/50 sm:p-6"
