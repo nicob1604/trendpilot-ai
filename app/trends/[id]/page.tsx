@@ -49,6 +49,25 @@ function formatPublishedAt(value: string | undefined) {
   }).format(date);
 }
 
+function getDisplayTimeframe(publishedAt: string | undefined, timeframe: string | undefined) {
+  const readablePublishedAt = formatPublishedAt(publishedAt);
+
+  if (readablePublishedAt) {
+    return readablePublishedAt;
+  }
+
+  const cleanedTimeframe = timeframe?.trim();
+
+  if (
+    cleanedTimeframe &&
+    !["youtube upload", "rss feed", "rss"].includes(cleanedTimeframe.toLowerCase())
+  ) {
+    return cleanedTimeframe;
+  }
+
+  return "Datum nicht hinterlegt";
+}
+
 function removePromoSentences(value: string) {
   return value
     .replace(/https?:\/\/[^\s)]+/gi, " ")
@@ -311,8 +330,8 @@ export default function TrendArticlePage() {
   const intro = cleanArticleText(getText(trend.articleSummary, trend.summary));
   const sourceName = getText(trend.sourceName, trend.source);
   const sourceUrl = isValidSourceUrl(trend.sourceUrl) ? trend.sourceUrl : undefined;
-  const readablePublishedAt = formatPublishedAt(trend.publishedAt);
-  const timeframe = readablePublishedAt || getText(trend.timeframe);
+  const timeframe = getDisplayTimeframe(trend.publishedAt, trend.timeframe);
+
   const happenedText =
     cleanArticleText(trend.articleBody) ||
     cleanArticleText(trend.summary) ||
