@@ -48,7 +48,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        928,
+        864,
         0
       ]
     },
@@ -72,7 +72,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        1200,
+        1232,
         192
       ],
       "credentials": {
@@ -84,7 +84,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const candidates = $(\"Trend-Daten normalisieren\").all();\nconst existingRows = $(\"Bestehende Trends lesen\").all();\n\nconst existingIds = new Set(\n  existingRows\n    .map((item) => String(item.json.id || \"\").trim())\n    .filter(Boolean)\n);\n\nconst newTrends = candidates.filter((item) => {\n  const id = String(item.json.id || \"\").trim();\n  return id && !existingIds.has(id);\n});\n\nreturn newTrends;"
+        "jsCode": "let candidateItems = [];\n\ntry {\n  candidateItems = $('Trend-Content verbessern').all();\n} catch (error) {\n  candidateItems = $('Trend-Daten normalisieren').all();\n}\n\nconst existingRows = $('Bestehende Trends lesen').all();\n\nfunction normalizeText(value) {\n  return String(value ?? '').trim().toLowerCase();\n}\n\nfunction normalizeYouTubeUrl(url) {\n  const raw = String(url ?? '').trim();\n\n  if (!raw) {\n    return '';\n  }\n\n  try {\n    const parsed = new URL(raw);\n    const host = parsed.hostname.replace(/^www\\./, '').toLowerCase();\n\n    if (host === 'youtu.be') {\n      const videoId = parsed.pathname.replace('/', '').trim().toLowerCase();\n      return videoId ? `youtube:${videoId}` : raw.toLowerCase();\n    }\n\n    if (host.includes('youtube.com')) {\n      if (parsed.pathname.startsWith('/watch')) {\n        const videoId = parsed.searchParams.get('v');\n        return videoId ? `youtube:${videoId.toLowerCase()}` : raw.toLowerCase();\n      }\n\n      if (parsed.pathname.startsWith('/shorts/')) {\n        const videoId = parsed.pathname.split('/shorts/')[1]?.split('/')[0];\n        return videoId ? `youtube:${videoId.toLowerCase()}` : raw.toLowerCase();\n      }\n    }\n\n    parsed.search = '';\n    parsed.hash = '';\n\n    return parsed.toString().replace(/\\/$/, '').toLowerCase();\n  } catch (error) {\n    return raw.replace(/\\/$/, '').toLowerCase();\n  }\n}\n\nconst existingIds = new Set(\n  existingRows\n    .map((item) => normalizeText(item.json.id))\n    .filter(Boolean)\n);\n\nconst existingUrls = new Set(\n  existingRows\n    .map((item) => normalizeYouTubeUrl(item.json.sourceUrl))\n    .filter(Boolean)\n);\n\nconst seenIdsInCurrentRun = new Set();\nconst seenUrlsInCurrentRun = new Set();\n\nconst newTrends = candidateItems.filter((item) => {\n  const id = normalizeText(item.json.id);\n  const sourceUrl = normalizeYouTubeUrl(item.json.sourceUrl);\n\n  if (!id && !sourceUrl) {\n    return false;\n  }\n\n  if (id && existingIds.has(id)) {\n    return false;\n  }\n\n  if (sourceUrl && existingUrls.has(sourceUrl)) {\n    return false;\n  }\n\n  if (id && seenIdsInCurrentRun.has(id)) {\n    return false;\n  }\n\n  if (sourceUrl && seenUrlsInCurrentRun.has(sourceUrl)) {\n    return false;\n  }\n\n  if (id) {\n    seenIdsInCurrentRun.add(id);\n  }\n\n  if (sourceUrl) {\n    seenUrlsInCurrentRun.add(sourceUrl);\n  }\n\n  return true;\n});\n\nreturn newTrends;"
       },
       "id": "12a5007a-0260-4ed8-b071-f97d65442e81",
       "name": "Nur neue Trends filtern",
@@ -359,6 +359,19 @@
       ],
       "id": "6c042ad1-1a08-4e22-8350-3967ba18f70c",
       "name": "YouTube-Quellen konfigurieren"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction toText(value) {\n  return String(value ?? '').trim();\n}\n\nfunction cleanWhitespace(text) {\n  return toText(text)\n    .replace(/\\r/g, '\\n')\n    .replace(/\\t/g, ' ')\n    .replace(/[ ]{2,}/g, ' ')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim();\n}\n\nfunction removeEmojis(text) {\n  try {\n    return text.replace(/[\\p{Extended_Pictographic}\\uFE0F]/gu, '').trim();\n  } catch (error) {\n    return text.trim();\n  }\n}\n\nfunction removeUrls(text) {\n  return text\n    .replace(/https?:\\/\\/[^\\s)]+/gi, '')\n    .replace(/www\\.[^\\s)]+/gi, '')\n    .replace(/\\b[a-z0-9.-]+\\.(de|com|net|org|io|ai|fm|co|academy|cloud|app)\\/[^\\s)]*/gi, '')\n    .trim();\n}\n\nfunction cutBeforePromoBlocks(text) {\n  const markers = [\n    '__________________________',\n    '----------------------------------------------',\n    'Exklusive Insights',\n    'Behind the Scenes',\n    'Folge mir hier',\n    'Folge uns',\n    'Optimiere dein YouTube-Erlebnis',\n    'Wir bei Everlast AI',\n    'Wir stellen ein',\n    'Subscribe to our channel',\n    'Find us on X',\n    'Follow us on Instagram',\n    'Add us on Linkedin',\n    'Jetzt deine Lebensbalance testen',\n    'Sichere dir deinen Platz',\n    'Sichere dir hier',\n    'Lerne alles auf',\n    'Lerne Tools',\n    'Du willst als Arbeitnehmer',\n    'Du willst dich selbstständig machen',\n    'Du bist Arbeitssuchend',\n    'Bleibe immer auf dem Laufenden',\n    'Alle kostenfreien Ressourcen',\n    'Mit diesem Tool mache ich',\n    'Senke deine menschliche Telefonzeit'\n  ];\n\n  let result = text;\n  const lower = result.toLowerCase();\n\n  let firstIndex = -1;\n\n  for (const marker of markers) {\n    const index = lower.indexOf(marker.toLowerCase());\n    if (index >= 0 && (firstIndex === -1 || index < firstIndex)) {\n      firstIndex = index;\n    }\n  }\n\n  if (firstIndex >= 0) {\n    result = result.slice(0, firstIndex);\n  }\n\n  return result.trim();\n}\n\nfunction removeTimestampLines(text) {\n  return text\n    .split('\\n')\n    .filter((line) => {\n      const value = line.trim();\n\n      if (!value) return true;\n\n      const isOnlyTimestampLine =\n        /^(\\d{1,2}:)?\\d{1,2}:\\d{2}\\s/.test(value) ||\n        /^(\\d{1,2}:)?\\d{1,2}:\\d{2}\\s*[–-]/.test(value);\n\n      const hasManyTimestamps = (value.match(/\\b(\\d{1,2}:)?\\d{1,2}:\\d{2}\\b/g) || []).length >= 3;\n\n      return !isOnlyTimestampLine && !hasManyTimestamps;\n    })\n    .join('\\n')\n    .trim();\n}\n\nfunction removeHashtagNoise(text) {\n  return text\n    .replace(/#[\\p{L}\\p{N}_-]+/gu, '')\n    .replace(/\\s{2,}/g, ' ')\n    .trim();\n}\n\nfunction removeLongSeparatorNoise(text) {\n  return text\n    .replace(/_{5,}/g, ' ')\n    .replace(/-{5,}/g, ' ')\n    .replace(/={5,}/g, ' ')\n    .trim();\n}\n\nfunction splitIntoSentences(text) {\n  const normalized = cleanWhitespace(text).replace(/\\n+/g, ' ');\n  const matches = normalized.match(/[^.!?]+[.!?]+|[^.!?]+$/g);\n  return (matches || [normalized])\n    .map((sentence) => sentence.trim())\n    .filter(Boolean);\n}\n\nfunction limitText(text, maxLength) {\n  const value = cleanWhitespace(text);\n\n  if (value.length <= maxLength) {\n    return value;\n  }\n\n  const shortened = value.slice(0, maxLength);\n  const lastSentenceEnd = Math.max(\n    shortened.lastIndexOf('.'),\n    shortened.lastIndexOf('!'),\n    shortened.lastIndexOf('?')\n  );\n\n  if (lastSentenceEnd > maxLength * 0.55) {\n    return shortened.slice(0, lastSentenceEnd + 1).trim();\n  }\n\n  return shortened.trim() + '…';\n}\n\nfunction cleanArticleText(rawText, fallbackTitle) {\n  let text = toText(rawText);\n\n  if (!text) {\n    text = toText(fallbackTitle);\n  }\n\n  text = cleanWhitespace(text);\n  text = cutBeforePromoBlocks(text);\n  text = removeTimestampLines(text);\n  text = removeUrls(text);\n  text = removeHashtagNoise(text);\n  text = removeLongSeparatorNoise(text);\n  text = removeEmojis(text);\n  text = cleanWhitespace(text);\n\n  return text || toText(fallbackTitle);\n}\n\nfunction createSummary(cleanedText, fallbackTitle) {\n  const sentences = splitIntoSentences(cleanedText);\n\n  let summary = sentences.slice(0, 2).join(' ');\n\n  if (!summary) {\n    summary = toText(fallbackTitle);\n  }\n\n  return limitText(summary, 520);\n}\n\nfunction createArticleBody(cleanedText, fallbackTitle) {\n  const sentences = splitIntoSentences(cleanedText);\n\n  let body = sentences.slice(0, 10).join(' ');\n\n  if (!body) {\n    body = toText(fallbackTitle);\n  }\n\n  return limitText(body, 2600);\n}\n\nfunction improveBusinessImpact(item) {\n  const name = toText(item.name || item.articleTitle);\n  const category = toText(item.category);\n\n  const categoryText = {\n    'AI Tools': 'neue KI-Tools, Entwicklerwerkzeuge, Agenten oder produktnahe KI-Anwendungen',\n    'AI Workflows': 'neue Automatisierungs-, Agenten- oder Produktivitätsmöglichkeiten mit KI',\n    'AI Infrastructure': 'KI-Infrastruktur, Developer-Tools, Rechenleistung oder technische Grundlagen für KI-Systeme',\n    'AI Product Demo': 'offizielle Produktfunktionen, Demos oder neue Anwendungsmöglichkeiten',\n    'AI Research': 'neue Modelle, Forschungsergebnisse, Sicherheitsfragen oder technische Fortschritte',\n    'Launches & Tool-Updates': 'neue Produktfunktionen, Tool-Updates oder marktnahe KI-Entwicklungen',\n    'Workflows': 'neue Arbeitsabläufe, Automatisierungen oder Produktivitätsprozesse'\n  };\n\n  const reason = categoryText[category] || 'neue KI-Entwicklungen, Tools oder relevante Marktsignale';\n\n  return `Dieses Signal ist relevant, weil es auf ${reason} hinweist: ${name}`;\n}\n\nfunction improveRecommendation(item) {\n  const status = toText(item.status);\n  const category = toText(item.category);\n\n  if (status.toLowerCase().includes('hoch')) {\n    return `Für das Trend-Radar priorisieren und prüfen, ob daraus ein konkreter Use Case im Bereich ${category || 'KI'} entsteht.`;\n  }\n\n  return `Weiter beobachten und prüfen, ob sich daraus ein relevanter Trend im Bereich ${category || 'KI'} entwickelt.`;\n}\n\nreturn items.map((item) => {\n  const input = item.json || {};\n\n  const title = toText(input.articleTitle || input.name);\n  const rawText =\n    input.articleBody ||\n    input.articleSummary ||\n    input.summary ||\n    input.description ||\n    input.name ||\n    '';\n\n  const cleanedText = cleanArticleText(rawText, title);\n\n  const articleSummary = createSummary(cleanedText, title);\n  const articleBody = createArticleBody(cleanedText, title);\n\n  const output = {\n    ...input,\n\n    summary: articleSummary,\n    businessImpact: improveBusinessImpact(input),\n    recommendation: improveRecommendation(input),\n\n    articleTitle: title,\n    articleSummary,\n    articleBody,\n\n    sourceName: toText(input.sourceName || input.source),\n    sourceUrl: toText(input.sourceUrl),\n    publishedAt: toText(input.publishedAt)\n  };\n\n  return {\n    json: output\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "5cc82529-f3df-424a-8ee4-bd362b857661",
+      "name": "Trend-Content verbessern"
     }
   ],
   "pinData": {},
@@ -394,7 +407,7 @@
       "main": [
         [
           {
-            "node": "Bestehende Trends lesen",
+            "node": "Trend-Content verbessern",
             "type": "main",
             "index": 0
           }
@@ -466,6 +479,17 @@
           }
         ]
       ]
+    },
+    "Trend-Content verbessern": {
+      "main": [
+        [
+          {
+            "node": "Bestehende Trends lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -474,7 +498,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "fa4bbbf3-037d-40ed-ba96-53fb959b8c0a",
+  "versionId": "5a929a9f-f6d6-4730-9920-a056ca91914a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "418e3b99acfe2aad5174d079763a7e217ac6723a96fb2cfbcde2563f7db8ec9b"
