@@ -29,6 +29,41 @@ function isValidSourceUrl(value: string | undefined) {
   return Boolean(value && /^https?:\/\//i.test(value));
 }
 
+function formatPublishedAt(value: string | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return undefined;
+  }
+
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function cleanArticleBody(value: string) {
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => {
+      if (!line) {
+        return false;
+      }
+
+      return !/^(quelle|source|originalquelle)\s*:/i.test(line);
+    })
+    .join("\n\n")
+    .trim();
+}
+
 function ArticleSection({
   title,
   children,
@@ -134,7 +169,9 @@ export default function TrendArticlePage() {
   const intro = trend.articleSummary || trend.summary;
   const sourceName = trend.sourceName || trend.source;
   const sourceUrl = isValidSourceUrl(trend.sourceUrl) ? trend.sourceUrl : undefined;
-  const happenedText = trend.articleBody || trend.summary;
+  const readablePublishedAt = formatPublishedAt(trend.publishedAt);
+  const happenedText =
+    cleanArticleBody(trend.articleBody || "") || cleanArticleBody(trend.summary);
 
   return (
     <main className="min-h-screen bg-[#0B0F14] bg-[radial-gradient(circle_at_50%_0%,rgba(164,196,0,0.12),transparent_34%),linear-gradient(180deg,#0B0F14_0%,#101722_58%,#0B0F14_100%)] px-4 py-8 text-white sm:px-8 lg:px-10">
@@ -166,7 +203,7 @@ export default function TrendArticlePage() {
           <div className="mt-6 flex flex-wrap gap-2 text-xs text-[#AEB7C2]">
             {[
               ["Quelle", sourceName],
-              ["Zeitraum", trend.publishedAt || trend.timeframe],
+              ["Zeitraum", readablePublishedAt || trend.timeframe],
               ["Signaltyp", trend.signalType],
             ].map(([label, value]) => (
               <span
@@ -183,7 +220,6 @@ export default function TrendArticlePage() {
         <div className="mt-6 grid gap-5">
           <ArticleSection title="Was ist passiert?">
             <p>{happenedText}</p>
-            <p>Quelle: {sourceName}</p>
           </ArticleSection>
 
           <ArticleSection title="Warum ist das relevant?">
