@@ -48,6 +48,35 @@ function formatLastUpdated(date: Date) {
   }).format(date);
 }
 
+function normalizeSearchText(value: unknown) {
+  return String(value ?? "")
+    .toLocaleLowerCase("de-DE")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getSearchTerms(query: string) {
+  return normalizeSearchText(query).split(" ").filter(Boolean);
+}
+
+function getTrendSearchText(trend: Trend) {
+  return normalizeSearchText(
+    [
+      trend.name,
+      trend.category,
+      trend.status,
+      trend.source,
+      trend.signalType,
+      trend.summary,
+      trend.businessImpact,
+      trend.recommendation,
+      trend.articleTitle,
+      trend.articleSummary,
+      trend.sourceName,
+    ].join(" "),
+  );
+}
+
 export default function DashboardPage() {
   const [trends, setTrends] = useState<Trend[]>([]);
   const [dataSource, setDataSource] = useState<string | null>(null);
@@ -222,22 +251,12 @@ export default function DashboardPage() {
   }, [selectedTrend]);
 
   const filteredTrends = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const searchTerms = getSearchTerms(searchQuery);
 
     const visibleTrends = trends.filter((trend) => {
       const matchesSearch =
-        normalizedQuery.length === 0 ||
-        [
-          trend.name,
-          trend.category,
-          trend.status,
-          trend.businessImpact,
-          trend.source,
-          trend.signalType,
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(normalizedQuery);
+        searchTerms.length === 0 ||
+        searchTerms.every((term) => getTrendSearchText(trend).includes(term));
 
       const matchesFilter =
         activeFilter === "Alle" ||
