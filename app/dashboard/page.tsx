@@ -302,6 +302,24 @@ export default function DashboardPage() {
     });
   }, [activeFilter, activeSourceFilter, searchQuery, sortOrder, trends]);
 
+  const cardTrends = useMemo(() => {
+    const tokens = getSearchTerms(searchQuery);
+
+    if (tokens.length === 0) {
+      return visibleTrends;
+    }
+
+    return visibleTrends.filter((trend) => {
+      const searchText = getTrendSearchText(trend);
+
+      return tokens.every((token) => searchText.includes(token));
+    });
+  }, [searchQuery, visibleTrends]);
+
+  const trendGridKey = `trend-grid-${searchQuery}-${activeFilter}-${activeSourceFilter}-${sortOrder}-${cardTrends
+    .map((trend) => trend.id)
+    .join("-")}`;
+
   return (
     <main className="min-h-screen bg-[#0B0F14] bg-[radial-gradient(circle_at_50%_0%,rgba(164,196,0,0.12),transparent_34%),linear-gradient(180deg,#0B0F14_0%,#101722_58%,#0B0F14_100%)] px-4 py-6 text-white sm:px-8 sm:py-8 lg:px-10">
       <div className="mx-auto max-w-7xl">
@@ -467,7 +485,7 @@ export default function DashboardPage() {
         {!isLoading && !loadError ? (
           <section className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-medium text-[#AEB7C2]">
-              {visibleTrends.length} Trends angezeigt
+              {cardTrends.length} Trends angezeigt
             </p>
             <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#AEB7C2]/70 sm:flex-row sm:items-center">
               Sortieren
@@ -502,9 +520,9 @@ export default function DashboardPage() {
               Trends konnten nicht geladen werden.
             </p>
           </section>
-        ) : visibleTrends.length > 0 ? (
-          <section className="grid gap-4 lg:grid-cols-2">
-            {visibleTrends.map((trend) => (
+        ) : cardTrends.length > 0 ? (
+          <section key={trendGridKey} className="grid gap-4 lg:grid-cols-2">
+            {cardTrends.map((trend) => (
               <article
                 key={trend.id}
                 className="group rounded-2xl border border-white/8 bg-[#121826] p-5 text-left shadow-[0_18px_55px_rgba(0,0,0,0.24)] transition hover:-translate-y-1 hover:border-[#A4C400]/35 hover:bg-[#151D2B] focus:outline-none focus:ring-2 focus:ring-[#A4C400]/50 sm:p-6"
